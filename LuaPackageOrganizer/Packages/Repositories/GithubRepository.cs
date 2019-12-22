@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
+using Newtonsoft.Json;
 
 namespace LuaPackageOrganizer.Packages.Repositories
 {
@@ -6,6 +8,7 @@ namespace LuaPackageOrganizer.Packages.Repositories
     {
         private const string GithubUserAgent = "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)";
         private const string PackageDetailsUri = "https://api.github.com/repos/{0}/{1}";
+        private const string PackageReleasesUri = "https://api.github.com/repos/{0}/{1}/tags";
 
         public bool PackageExists(IPackage package)
         {
@@ -27,6 +30,22 @@ namespace LuaPackageOrganizer.Packages.Repositories
             }
 
             return true;
+        }
+
+        public List<Release> GetAvailableReleases(IPackage package)
+        {
+            List<Release> releases;
+
+            using (var client = new WebClient())
+            {
+                client.Headers.Add("user-agent", GithubUserAgent);
+                var jsonResponse =
+                    client.DownloadString(string.Format(PackageReleasesUri, package.Vendor, package.PackageName));
+
+                releases = JsonConvert.DeserializeObject<List<Release>>(jsonResponse);
+            }
+
+            return releases;
         }
     }
 }
