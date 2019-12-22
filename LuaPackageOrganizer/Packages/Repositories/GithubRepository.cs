@@ -32,6 +32,18 @@ namespace LuaPackageOrganizer.Packages.Repositories
             return true;
         }
 
+        public bool IsReleaseAvailable(IPackage package, Release release)
+        {
+            var availableReleases = GetAvailableReleases(package);
+            foreach (var rel in availableReleases)
+            {
+                if (release.Name.Equals(rel.Name))
+                    return true;
+            }
+
+            return false;
+        }
+
         public List<Release> GetAvailableReleases(IPackage package)
         {
             List<Release> releases;
