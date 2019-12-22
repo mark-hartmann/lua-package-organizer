@@ -1,4 +1,4 @@
-﻿namespace LuaPackageOrganizer
+﻿namespace LuaPackageOrganizer.Packages
 {
     public interface IPackageRepository
     {
