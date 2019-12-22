@@ -6,9 +6,16 @@ namespace LuaPackageOrganizer.Packages.Repositories
 {
     public class GithubRepository : IPackageRepository
     {
+        private Dictionary<IPackage, List<Release>> _releaseCache;
+
         private const string GithubUserAgent = "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)";
         private const string PackageDetailsUri = "https://api.github.com/repos/{0}/{1}";
         private const string PackageReleasesUri = "https://api.github.com/repos/{0}/{1}/tags";
+
+        public GithubRepository()
+        {
+            _releaseCache = new Dictionary<IPackage, List<Release>>();
+        }
 
         public bool PackageExists(IPackage package)
         {
@@ -34,7 +41,14 @@ namespace LuaPackageOrganizer.Packages.Repositories
 
         public bool IsReleaseAvailable(IPackage package, Release release)
         {
-            var availableReleases = GetAvailableReleases(package);
+            // If the available releases were not fetched yet we do so
+            // todo: If a package does not have any releases GetAvailableReleases gets called every time!
+            if (_releaseCache.Count == 0 || _releaseCache.ContainsKey(package) == false)
+            {
+                GetAvailableReleases(package);
+            }
+
+            var availableReleases = _releaseCache[package];
             foreach (var rel in availableReleases)
             {
                 if (release.Name.Equals(rel.Name))
@@ -46,16 +60,25 @@ namespace LuaPackageOrganizer.Packages.Repositories
 
         public List<Release> GetAvailableReleases(IPackage package)
         {
-            List<Release> releases;
+            // If the available releases for this package were requested previously just return it from the release
+            // cache. This saves additional http requests
+            if (_releaseCache.ContainsKey(package))
+            {
+                return _releaseCache[package];
+            }
 
+            List<Release> releases;
             using (var client = new WebClient())
             {
                 client.Headers.Add("user-agent", GithubUserAgent);
+                // todo: What happens if there are no releases for this package or no package at all? 
                 var jsonResponse =
                     client.DownloadString(string.Format(PackageReleasesUri, package.Vendor, package.PackageName));
 
                 releases = JsonConvert.DeserializeObject<List<Release>>(jsonResponse);
             }
+
+            _releaseCache.Add(package, releases);
 
             return releases;
         }
