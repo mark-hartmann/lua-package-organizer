@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using Newtonsoft.Json;
 
@@ -11,6 +13,7 @@ namespace LuaPackageOrganizer.Packages.Repositories
         private const string GithubUserAgent = "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)";
         private const string PackageDetailsUri = "https://api.github.com/repos/{0}/{1}";
         private const string PackageReleasesUri = "https://api.github.com/repos/{0}/{1}/tags";
+        private const string PackageDownloadUri = "https://github.com/{0}/{1}/zipball/{2}";
 
         public GithubRepository()
         {
@@ -81,6 +84,26 @@ namespace LuaPackageOrganizer.Packages.Repositories
             _releaseCache.Add(package, releases);
 
             return releases;
+        }
+
+        public string DownloadPackage(VirtualRemotePackage package)
+        {
+            var tempFile = Path.GetTempFileName(); // Creates a temporary file to write the zip to
+            var downloadUri = new Uri(string.Format(PackageDownloadUri, package.Vendor, package.PackageName, package.Release));
+
+            using var client = new WebClient();
+
+            Console.Write($"Downloading {package.Vendor}/{package.PackageName} from {downloadUri.Host}: ");
+            client.DownloadFileAsync(downloadUri, tempFile);
+
+            // While the package is downloading, display a spinner to indicate that something is happening
+            while (client.IsBusy)
+            {
+            }
+
+            Console.WriteLine("Done.");
+
+            return tempFile;
         }
     }
 }

@@ -39,6 +39,11 @@ namespace LuaPackageOrganizer.Environments
             return false;
         }
 
+        public string GetInstallationDirectoryFor(VirtualRemotePackage package)
+        {
+            return Path.Join(VendorDirectory, package.Vendor, package.PackageName);
+        }
+
         private void ValidateProjectStructure()
         {
             if (File.Exists(LupoJsonFile) != true)
