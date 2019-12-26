@@ -13,7 +13,7 @@ namespace LuaPackageOrganizer.Packages
 
         private static string GenerateErrorMessage(IPackage package)
         {
-            return $"No such release ({package.Release}) for {package.Vendor}{package.PackageName}";
+            return $"No such release ({package.Release.Name}) for {package.Vendor}{package.PackageName}";
         }
     }
 }
