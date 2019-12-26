@@ -59,8 +59,9 @@ namespace LuaPackageOrganizer
             // As the file is temporary, it should be removed after extraction
             File.Delete(packageZipFile);
 
+            environment.MarkAsInstalled(package);
+            
             // todo: Take a look in the lupo.json file to check if the installed package has any requirements
-            // todo: Generate packages.lua and update lupo.json
         }
     }
 }
