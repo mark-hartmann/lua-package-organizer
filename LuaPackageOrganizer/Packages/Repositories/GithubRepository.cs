@@ -89,7 +89,8 @@ namespace LuaPackageOrganizer.Packages.Repositories
         public string DownloadPackage(VirtualRemotePackage package)
         {
             var tempFile = Path.GetTempFileName(); // Creates a temporary file to write the zip to
-            var downloadUri = new Uri(string.Format(PackageDownloadUri, package.Vendor, package.PackageName, package.Release));
+            var downloadUri = new Uri(string.Format(PackageDownloadUri, package.Vendor, package.PackageName,
+                package.Release.Name));
 
             using var client = new WebClient();
 
