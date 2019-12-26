@@ -10,6 +10,7 @@ namespace LuaPackageOrganizer.Environments
     public class LocalEnvironment
     {
         private readonly string _rootDirectory;
+        private readonly JObject _parsedLupoJson;
         private readonly List<IPackage> _installedPackages;
 
         private string VendorDirectory => Path.Join(_rootDirectory, "vendor");
@@ -21,6 +22,8 @@ namespace LuaPackageOrganizer.Environments
             _installedPackages = new List<IPackage>();
 
             ValidateProjectStructure();
+            _parsedLupoJson = ParseLupoJson(LupoJsonFile);
+            ReadInstalledPackages();
         }
 
         public bool PackageAlreadyInstalled(IPackage package)
@@ -39,6 +42,16 @@ namespace LuaPackageOrganizer.Environments
             return false;
         }
 
+        public void MarkAsInstalled(VirtualRemotePackage package)
+        {
+            _parsedLupoJson["packages"][package.Vendor + '/' + package.PackageName] = package.Release.Name;
+        }
+
+        public void WriteLupoJson()
+        {
+            File.WriteAllText(LupoJsonFile, _parsedLupoJson.ToString());
+        }
+
         public string GetInstallationDirectoryFor(VirtualRemotePackage package)
         {
             return Path.Join(VendorDirectory, package.Vendor, package.PackageName);
@@ -51,14 +64,11 @@ namespace LuaPackageOrganizer.Environments
 
             if (Directory.Exists(VendorDirectory) != true)
                 throw new Exception("vendor directory does not exist");
-
-            ReadInstalledPackages();
         }
 
         private void ReadInstalledPackages()
         {
-            var lupoJson = ParseLupoJson(LupoJsonFile);
-            var packages = lupoJson["packages"].ToList();
+            var packages = _parsedLupoJson["packages"].ToList();
 
             foreach (var jToken in packages)
             {
