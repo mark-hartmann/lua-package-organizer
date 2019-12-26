@@ -15,12 +15,11 @@ namespace LuaPackageOrganizer.Commands.Processes
 
             try
             {
-                if (repository.PackageExists(package) == false)
-                    throw new PackageNotFoundException($"Package {options.Package} does not exist, was it a typo?");
+                if (repository.PackageExists(package) == false) 
+                    throw new PackageNotFoundException(package);
 
                 if (repository.IsReleaseAvailable(package, package.Release) == false)
-                    throw new ReleaseNotFoundException(
-                        $"No such release ({options.Release}) for {options.Package}");
+                    throw new ReleaseNotFoundException(package);
 
                 PackageInstaller.Install(package, repository, environment);
                 environment.WriteLupoJson();
