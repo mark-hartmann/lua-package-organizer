@@ -8,43 +8,22 @@ namespace LuaPackageOrganizer.Commands.Processes
 {
     public class InstallProcess
     {
-        private readonly Queue<Package> _installQueue;
         private readonly GithubRepository _repository;
-        private readonly LocalEnvironment _environment;
+        private readonly FileSystemEnvironment _environment;
 
         public InstallProcess()
         {
             _repository = new GithubRepository();
-            _environment = new LocalEnvironment();
-            _installQueue = new Queue<Package>();
+            _environment = FileSystemEnvironment.Local();
         }
 
         public void Execute(InstallOptions options)
         {
-            var mainPackage = Package.FromInstallOptions(options);
-            _installQueue.Enqueue(mainPackage);
+            var package = Package.FromInstallOptions(options);
 
             try
             {
-                while (_installQueue.Count != 0)
-                {
-                    var package = _installQueue.Dequeue();
-
-                    if (_repository.PackageExists(package) == false)
-                        throw new PackageNotFoundException(package);
-
-                    if (_repository.IsReleaseAvailable(package, package.Release) == false)
-                        throw new ReleaseNotFoundException(package);
-
-                    PackageInstaller.Install(package, _repository, _environment, _installQueue);
-
-                    // Only add the package to lupo.json if the package is actually the one the user wants to install.
-                    // All other packages / dependencies are "passive" 
-                    if (package.FullName.Equals(mainPackage.FullName))
-                    {
-                        _environment.LupoJson.AddPackage(package);
-                    }
-                }
+                _environment.InstallPackage(package, _repository);
             }
             catch (ReleaseNotFoundException e)
             {
@@ -91,12 +70,12 @@ You can create an issue and ask the content creator to provide a release by foll
 
             // If the environment was modified, the content of the lupo.json file gets overwritten with the newly
             // installed package
-            if (_environment.LupoJson.IsModified && !_environment.IsCurrupted)
+            if (_environment.LupoJson.IsModified)
                 _environment.LupoJson.WriteChanges();
 
             // If the environment was modified (added folders) but failed during the installation process, the mess must
             // be cleaned and set back to the initial state
-            if (_environment.LupoJson.IsModified && _environment.IsCurrupted)
+            if (_environment.LupoJson.IsModified)
             {
                 // todo: Cleanup all the mess that was added during the process
                 // todo: Iterate through all added packages and cleanup all created directories or so 

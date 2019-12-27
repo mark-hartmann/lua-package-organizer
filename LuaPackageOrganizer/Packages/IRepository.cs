@@ -9,5 +9,7 @@ namespace LuaPackageOrganizer.Packages
         public bool IsReleaseAvailable(Package package, Release release);
 
         public List<Release> GetAvailableReleases(Package package);
+
+        public void DownloadFiles(Package package, string targetDirectory);
     }
 }

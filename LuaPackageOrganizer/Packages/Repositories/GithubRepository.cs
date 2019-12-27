@@ -15,6 +15,8 @@ namespace LuaPackageOrganizer.Packages.Repositories
         private const string PackageReleasesUri = "https://api.github.com/repos/{0}/{1}/tags";
         private const string PackageDownloadUri = "https://github.com/{0}/{1}/zipball/{2}";
 
+        private const string RepositoryName = "Github";
+
         public GithubRepository()
         {
             _releaseCache = new Dictionary<Package, List<Release>>();
@@ -86,7 +88,7 @@ namespace LuaPackageOrganizer.Packages.Repositories
             return releases;
         }
 
-        public string DownloadPackage(Package package)
+        public void DownloadFiles(Package package, string packageDirectory)
         {
             var tempFile = Path.GetTempFileName(); // Creates a temporary file to write the zip to
             var downloadUri = new Uri(string.Format(PackageDownloadUri, package.Vendor, package.PackageName,
@@ -94,7 +96,7 @@ namespace LuaPackageOrganizer.Packages.Repositories
 
             using var client = new WebClient();
 
-            Console.Write($"Downloading {package.Vendor}/{package.PackageName} from {downloadUri.Host}: ");
+            Console.Write($"Downloading {package.Vendor}/{package.PackageName} from {RepositoryName}: ");
             client.DownloadFileAsync(downloadUri, tempFile);
 
             // While the package is downloading, display a spinner to indicate that something is happening
@@ -102,9 +104,9 @@ namespace LuaPackageOrganizer.Packages.Repositories
             {
             }
 
-            Console.WriteLine("Done.");
+            Console.WriteLine("- Done.");
 
-            return tempFile;
+            ZipExtractor.ExtractTo(tempFile, packageDirectory);
         }
     }
 }
