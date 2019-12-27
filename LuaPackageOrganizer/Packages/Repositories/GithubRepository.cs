@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace LuaPackageOrganizer.Packages.Repositories
 {
-    public class GithubRepository : IPackageRepository
+    public class GithubRepository : IRepository
     {
         private Dictionary<Package, List<Release>> _releaseCache;
 

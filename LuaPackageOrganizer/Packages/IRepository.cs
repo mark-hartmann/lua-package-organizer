@@ -2,7 +2,7 @@
 
 namespace LuaPackageOrganizer.Packages
 {
-    public interface IPackageRepository
+    public interface IRepository
     {
         public bool PackageExists(Package package);
 
