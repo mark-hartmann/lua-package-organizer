@@ -96,7 +96,7 @@ namespace LuaPackageOrganizer.Packages.Repositories
 
             using var client = new WebClient();
 
-            Console.Write($"Downloading {package.Vendor}/{package.PackageName} from {RepositoryName}: ");
+            Console.Write($"+ Downloading {package} from {RepositoryName}: ");
             client.DownloadFileAsync(downloadUri, tempFile);
 
             // While the package is downloading, display a spinner to indicate that something is happening

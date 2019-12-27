@@ -72,11 +72,11 @@ namespace LuaPackageOrganizer.Environments
                     if (PackageAlreadyInstalled(requirement) == false)
                     {
                         installationQueue.Enqueue(requirement);
-                        Console.WriteLine($"- Requirement {requirement.FullName} needs to be installed.");
+                        Console.WriteLine($"- {requirement} needs to be installed.");
                     }
                     else
                     {
-                        Console.WriteLine($"- Requirement {requirement.FullName} already satisfied.");
+                        Console.WriteLine($"- {requirement} already satisfied.");
                     }
                 }
             }
