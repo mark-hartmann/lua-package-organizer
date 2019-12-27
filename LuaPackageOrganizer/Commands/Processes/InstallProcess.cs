@@ -14,6 +14,9 @@ namespace LuaPackageOrganizer.Commands.Processes
         public InstallProcess()
         {
             _repository = new GithubRepository();
+            
+            // Creates a local environment (current project). Later there should be something like a "global"
+            // environment to be able to access installed packages from different projects
             _environment = FileSystemEnvironment.Local();
         }
 
