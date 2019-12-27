@@ -44,5 +44,10 @@ namespace LuaPackageOrganizer.Packages
 
             return package;
         }
+
+        public override string ToString()
+        {
+            return $"[Package: {Vendor}/{PackageName} @ Version: {Release.Name}]";
+        }
     }
 }

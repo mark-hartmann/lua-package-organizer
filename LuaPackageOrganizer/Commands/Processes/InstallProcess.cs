@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using LuaPackageOrganizer.Environments;
 using LuaPackageOrganizer.Packages;
 using LuaPackageOrganizer.Packages.Repositories;
@@ -14,7 +13,7 @@ namespace LuaPackageOrganizer.Commands.Processes
         public InstallProcess()
         {
             _repository = new GithubRepository();
-            
+
             // Creates a local environment (current project). Later there should be something like a "global"
             // environment to be able to access installed packages from different projects
             _environment = FileSystemEnvironment.Local();
@@ -26,7 +25,15 @@ namespace LuaPackageOrganizer.Commands.Processes
 
             try
             {
-                _environment.InstallPackage(package, _repository);
+                if (_environment.PackageAlreadyInstalled(package) == false)
+                {
+                    _environment.InstallPackage(package, _repository);
+                }
+                else
+                {
+                    Console.WriteLine($"{package} is already installed, ready for takeoff");
+                }
+                
             }
             catch (ReleaseNotFoundException e)
             {
