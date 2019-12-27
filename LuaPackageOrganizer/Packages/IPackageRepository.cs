@@ -4,10 +4,10 @@ namespace LuaPackageOrganizer.Packages
 {
     public interface IPackageRepository
     {
-        public bool PackageExists(IPackage package);
+        public bool PackageExists(Package package);
 
-        public bool IsReleaseAvailable(IPackage package, Release release);
+        public bool IsReleaseAvailable(Package package, Release release);
 
-        public List<Release> GetAvailableReleases(IPackage package);
+        public List<Release> GetAvailableReleases(Package package);
     }
 }

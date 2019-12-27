@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using LuaPackageOrganizer.Packages;
 using Newtonsoft.Json.Linq;
 
@@ -9,26 +8,29 @@ namespace LuaPackageOrganizer.Environments
 {
     public class LocalEnvironment
     {
-        private readonly string _rootDirectory;
-        private readonly JObject _parsedLupoJson;
-        private readonly List<IPackage> _installedPackages;
+        private readonly string _root;
 
-        private string VendorDirectory => Path.Join(_rootDirectory, "vendor");
-        private string LupoJsonFile => Path.Join(_rootDirectory, "lupo.json");
+
+        public LupoJsonFile LupoJson { get; }
+        public List<Exception> Errors { get; }
+
+        public bool IsModified => LupoJson.IsModified;
+        public bool IsCurrupted => Errors.Count != 0;
+
+        private string LupoJsonFile => Path.Join(_root, "lupo.json");
+        private string VendorDirectory => Path.Join(_root, "vendor");
 
         public LocalEnvironment()
         {
-            _rootDirectory = @"C:\Users\markh\IdeaProjects\LupoTestPackage"; // Directory.GetCurrentDirectory()
-            _installedPackages = new List<IPackage>();
-
+            Errors = new List<Exception>();
+            _root = @"C:\Users\markh\IdeaProjects\LupoTestPackage"; // Directory.GetCurrentDirectory()
             ValidateProjectStructure();
-            _parsedLupoJson = ParseLupoJson(LupoJsonFile);
-            ReadInstalledPackages();
+            LupoJson = LuaPackageOrganizer.LupoJsonFile.ParseFile(LupoJsonFile);
         }
 
-        public bool PackageAlreadyInstalled(IPackage package)
+        public bool PackageAlreadyInstalled(Package package)
         {
-            foreach (var installed in _installedPackages)
+            foreach (var installed in LupoJson.Packages)
             {
                 if (!installed.Vendor.Equals(package.Vendor) || !installed.PackageName.Equals(package.PackageName))
                     continue;
@@ -42,17 +44,12 @@ namespace LuaPackageOrganizer.Environments
             return false;
         }
 
-        public void MarkAsInstalled(VirtualRemotePackage package)
+        public void MarkAsInstalled(Package package)
         {
-            _parsedLupoJson["packages"][package.Vendor + '/' + package.PackageName] = package.Release.Name;
+            LupoJson.AddPackage(package);
         }
 
-        public void WriteLupoJson()
-        {
-            File.WriteAllText(LupoJsonFile, _parsedLupoJson.ToString());
-        }
-
-        public string GetInstallationDirectoryFor(VirtualRemotePackage package)
+        public string GetInstallationDirectoryFor(Package package)
         {
             return Path.Join(VendorDirectory, package.Vendor, package.PackageName);
         }
@@ -64,28 +61,6 @@ namespace LuaPackageOrganizer.Environments
 
             if (Directory.Exists(VendorDirectory) != true)
                 throw new Exception("vendor directory does not exist");
-        }
-
-        private void ReadInstalledPackages()
-        {
-            var packages = _parsedLupoJson["packages"].ToList();
-
-            foreach (var jToken in packages)
-            {
-                var installedPackage = new InstalledPackage((JProperty) jToken);
-
-                // todo: Check if the package's directory exists in this environment
-                _installedPackages.Add(installedPackage);
-            }
-        }
-
-        private static JObject ParseLupoJson(string file)
-        {
-            if (File.Exists(file) != true)
-                throw new Exception("lupo.json not found");
-
-            // todo: Validate lupo.json schema
-            return JObject.Parse(File.ReadAllText(file));
         }
     }
 }

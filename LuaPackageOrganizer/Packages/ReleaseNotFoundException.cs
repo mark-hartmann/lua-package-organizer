@@ -4,14 +4,14 @@ namespace LuaPackageOrganizer.Packages
 {
     public class ReleaseNotFoundException : Exception
     {
-        public IPackage FailedPackage { get; }
+        public Package FailedPackage { get; }
 
-        public ReleaseNotFoundException(IPackage package) : base(GenerateErrorMessage(package))
+        public ReleaseNotFoundException(Package package) : base(GenerateErrorMessage(package))
         {
             FailedPackage = package;
         }
 
-        private static string GenerateErrorMessage(IPackage package)
+        private static string GenerateErrorMessage(Package package)
         {
             return $"No such release ({package.Release.Name}) for {package.Vendor}{package.PackageName}";
         }

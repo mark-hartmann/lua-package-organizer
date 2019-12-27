@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using LuaPackageOrganizer.Environments;
 using LuaPackageOrganizer.Packages;
 using LuaPackageOrganizer.Packages.Repositories;
@@ -7,26 +8,39 @@ namespace LuaPackageOrganizer.Commands.Processes
 {
     public class InstallProcess
     {
+        private readonly Queue<Package> _installQueue;
+        private readonly GithubRepository _repository;
+        private readonly LocalEnvironment _environment;
+
+        public InstallProcess()
+        {
+            _repository = new GithubRepository();
+            _environment = new LocalEnvironment();
+            _installQueue = new Queue<Package>();
+        }
+
         public void Execute(InstallOptions options)
         {
-            var repository = new GithubRepository();
-            var environment = new LocalEnvironment();
-            var package = new VirtualRemotePackage(options);
+            _installQueue.Enqueue(Package.FromInstallOptions(options));
 
             try
             {
-                if (repository.PackageExists(package) == false) 
-                    throw new PackageNotFoundException(package);
+                while (_installQueue.Count != 0)
+                {
+                    var package = _installQueue.Dequeue();
 
-                if (repository.IsReleaseAvailable(package, package.Release) == false)
-                    throw new ReleaseNotFoundException(package);
+                    if (_repository.PackageExists(package) == false)
+                        throw new PackageNotFoundException(package);
 
-                PackageInstaller.Install(package, repository, environment);
-                environment.WriteLupoJson();
+                    if (_repository.IsReleaseAvailable(package, package.Release) == false)
+                        throw new ReleaseNotFoundException(package);
+
+                    PackageInstaller.Install(package, _repository, _environment, _installQueue);
+                }
             }
             catch (ReleaseNotFoundException e)
             {
-                var availableReleases = repository.GetAvailableReleases(package);
+                var availableReleases = _repository.GetAvailableReleases(e.FailedPackage);
                 Console.WriteLine(e.Message + ", " + (availableReleases.Count == 0
                                       ? "no releases available."
                                       : "the following releases are available:"));
@@ -65,6 +79,19 @@ You can create an issue and ask the content creator to provide a release by foll
             catch (Exception e)
             {
                 Console.WriteLine(e);
+            }
+
+            // If the environment was modified, the content of the lupo.json file gets overwritten with the newly
+            // installed package
+            if (_environment.LupoJson.IsModified && !_environment.IsCurrupted)
+                _environment.LupoJson.WriteChanges();
+
+            // If the environment was modified (added folders) but failed during the installation process, the mess must
+            // be cleaned and set back to the initial state
+            if (_environment.LupoJson.IsModified && _environment.IsCurrupted)
+            {
+                // todo: Cleanup all the mess that was added during the process
+                // todo: Iterate through all added packages and cleanup all created directories or so 
             }
         }
     }

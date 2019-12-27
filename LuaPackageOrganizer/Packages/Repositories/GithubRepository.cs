@@ -8,7 +8,7 @@ namespace LuaPackageOrganizer.Packages.Repositories
 {
     public class GithubRepository : IPackageRepository
     {
-        private Dictionary<IPackage, List<Release>> _releaseCache;
+        private Dictionary<Package, List<Release>> _releaseCache;
 
         private const string GithubUserAgent = "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)";
         private const string PackageDetailsUri = "https://api.github.com/repos/{0}/{1}";
@@ -17,10 +17,10 @@ namespace LuaPackageOrganizer.Packages.Repositories
 
         public GithubRepository()
         {
-            _releaseCache = new Dictionary<IPackage, List<Release>>();
+            _releaseCache = new Dictionary<Package, List<Release>>();
         }
 
-        public bool PackageExists(IPackage package)
+        public bool PackageExists(Package package)
         {
             using (var client = new WebClient())
             {
@@ -42,7 +42,7 @@ namespace LuaPackageOrganizer.Packages.Repositories
             return true;
         }
 
-        public bool IsReleaseAvailable(IPackage package, Release release)
+        public bool IsReleaseAvailable(Package package, Release release)
         {
             // If the available releases were not fetched yet we do so
             // todo: If a package does not have any releases GetAvailableReleases gets called every time!
@@ -61,7 +61,7 @@ namespace LuaPackageOrganizer.Packages.Repositories
             return false;
         }
 
-        public List<Release> GetAvailableReleases(IPackage package)
+        public List<Release> GetAvailableReleases(Package package)
         {
             // If the available releases for this package were requested previously just return it from the release
             // cache. This saves additional http requests
@@ -86,7 +86,7 @@ namespace LuaPackageOrganizer.Packages.Repositories
             return releases;
         }
 
-        public string DownloadPackage(VirtualRemotePackage package)
+        public string DownloadPackage(Package package)
         {
             var tempFile = Path.GetTempFileName(); // Creates a temporary file to write the zip to
             var downloadUri = new Uri(string.Format(PackageDownloadUri, package.Vendor, package.PackageName,

@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.IO.Compression;
 using LuaPackageOrganizer.Environments;
 using LuaPackageOrganizer.Packages;
@@ -42,14 +44,13 @@ namespace LuaPackageOrganizer
                 }
                 else
                 {
-                    var byteArray = memStream.ToArray();
-                    File.WriteAllBytes(newFilename, byteArray);
+                    File.WriteAllBytes(newFilename, memStream.ToArray());
                 }
             }
         }
 
-        public static void Install(VirtualRemotePackage package, GithubRepository repository,
-            LocalEnvironment environment)
+        public static void Install(Package package, GithubRepository repository,
+            LocalEnvironment environment, Queue<Package> installationQueue)
         {
             var packageZipFile = repository.DownloadPackage(package);
             var installationDirectory = environment.GetInstallationDirectoryFor(package);
@@ -60,8 +61,26 @@ namespace LuaPackageOrganizer
             File.Delete(packageZipFile);
 
             environment.MarkAsInstalled(package);
-            
-            // todo: Take a look in the lupo.json file to check if the installed package has any requirements
+
+            var lupoFile = Path.Join(installationDirectory, "lupo.json");
+
+            if (!File.Exists(lupoFile))
+                return;
+
+            // Iterate through the requirements the installed package has and add it to the installation queue if needed
+            var packageLupoJson = LupoJsonFile.ParseFile(lupoFile);
+            foreach (var subrequirement in packageLupoJson.Packages)
+            {
+                if (environment.PackageAlreadyInstalled(subrequirement) == false)
+                {
+                    installationQueue.Enqueue(subrequirement);
+                    Console.WriteLine($"- Requirement {subrequirement.FullName} needs to be installed.");
+                }
+                else
+                {
+                    Console.WriteLine($"- Requirement {subrequirement.FullName} already satisfied.");
+                }
+            }
         }
     }
 }
