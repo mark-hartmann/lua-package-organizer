@@ -60,8 +60,6 @@ namespace LuaPackageOrganizer
             // As the file is temporary, it should be removed after extraction
             File.Delete(packageZipFile);
 
-            environment.MarkAsInstalled(package);
-
             var lupoFile = Path.Join(installationDirectory, "lupo.json");
 
             if (!File.Exists(lupoFile))

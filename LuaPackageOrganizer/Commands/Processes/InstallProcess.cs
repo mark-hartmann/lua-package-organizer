@@ -21,7 +21,8 @@ namespace LuaPackageOrganizer.Commands.Processes
 
         public void Execute(InstallOptions options)
         {
-            _installQueue.Enqueue(Package.FromInstallOptions(options));
+            var mainPackage = Package.FromInstallOptions(options);
+            _installQueue.Enqueue(mainPackage);
 
             try
             {
@@ -36,6 +37,13 @@ namespace LuaPackageOrganizer.Commands.Processes
                         throw new ReleaseNotFoundException(package);
 
                     PackageInstaller.Install(package, _repository, _environment, _installQueue);
+
+                    // Only add the package to lupo.json if the package is actually the one the user wants to install.
+                    // All other packages / dependencies are "passive" 
+                    if (package.FullName.Equals(mainPackage.FullName))
+                    {
+                        _environment.LupoJson.AddPackage(package);
+                    }
                 }
             }
             catch (ReleaseNotFoundException e)
