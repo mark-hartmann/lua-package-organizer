@@ -12,6 +12,8 @@ namespace LuaPackageOrganizer.Environments
         private string LupoJsonFile { get; }
         private string VendorDirectory { get; }
 
+        private Dictionary<Package, LupoJsonFile> _installedPackages;
+
         private FileSystemEnvironment(string root)
         {
             LupoJsonFile = Path.Join(root, "lupo.json");
@@ -24,6 +26,9 @@ namespace LuaPackageOrganizer.Environments
                 throw new Exception("vendor directory does not exist");
 
             LupoJson = LuaPackageOrganizer.LupoJsonFile.ParseFile(LupoJsonFile);
+            _installedPackages = new Dictionary<Package, LupoJsonFile>();
+            
+            ReadInstalledPackages();
         }
 
         public static FileSystemEnvironment Local()
@@ -67,9 +72,13 @@ namespace LuaPackageOrganizer.Environments
                 var lupoFile = Path.Join(GetInstallationDirectoryFor(installingPackage), "lupo.json");
 
                 if (!File.Exists(lupoFile))
+                {
+                    _installedPackages[installingPackage] = null;
                     continue;
+                }
 
-                foreach (var requirement in LuaPackageOrganizer.LupoJsonFile.ParseFile(lupoFile).Packages)
+                _installedPackages[installingPackage] = LuaPackageOrganizer.LupoJsonFile.ParseFile(lupoFile);
+                foreach (var requirement in _installedPackages[installingPackage].Packages)
                 {
                     if (PackageAlreadyInstalled(requirement) == false)
                     {
@@ -89,6 +98,24 @@ namespace LuaPackageOrganizer.Environments
         private string GetInstallationDirectoryFor(Package package)
         {
             return Path.Join(VendorDirectory, package.Vendor, package.PackageName);
+        }
+
+        private void ReadInstalledPackages()
+        {
+            foreach (var vendorDirectory in Directory.EnumerateDirectories(VendorDirectory))
+            {
+                foreach (var packageDirectory in Directory.EnumerateDirectories(vendorDirectory))
+                {
+                    // todo: This is not as fancy as i wish it was...
+                    var dirInfo = new DirectoryInfo(packageDirectory);
+                    var package = new Package(dirInfo.Parent?.Name, dirInfo.Name, new Release());
+                    var lupoFile = Path.Join(packageDirectory, "lupo.json");
+
+                    _installedPackages[package] = File.Exists(lupoFile)
+                        ? LuaPackageOrganizer.LupoJsonFile.ParseFile(lupoFile)
+                        : null;
+                }
+            }
         }
     }
 }
