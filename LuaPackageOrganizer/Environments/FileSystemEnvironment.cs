@@ -39,7 +39,9 @@ namespace LuaPackageOrganizer.Environments
             if (foundPackages.Count == 0)
                 return false;
 
-            if (foundPackages.Any(p => p.Release.Equals(package.Release) == false))
+            // Checks if there the passed package was previously installed with a different version. This only works if
+            // the releases name is not null
+            if (package.Release.Name != null && !foundPackages.Any(p => p.Release.Equals(package.Release)))
                 throw new Exception($"{package.FullName} installed with a different version ({package.Release.Name})");
 
             return true;
