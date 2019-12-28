@@ -5,7 +5,6 @@ namespace LuaPackageOrganizer.Commands
     [Verb("install", HelpText = "Install a package to your project")]
     public class InstallOptions
     {
-        
         public string Vendor { get; set; }
         public string PackageName { get; set; }
 

@@ -1,48 +1,26 @@
-﻿using LuaPackageOrganizer.Commands;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 
 namespace LuaPackageOrganizer.Packages
 {
     public class Package
     {
-        public string Vendor { get; private set; }
-        public string PackageName { get; private set; }
-        public Release Release { get; private set; }
+        public string Vendor { get; }
+        public string PackageName { get; }
+        public Release Release { get; }
         public string FullName => Vendor + '/' + PackageName;
 
-        private Package()
+        public Package(string vendor, string packageName, Release release)
         {
+            Vendor = vendor;
+            Release = release;
+            PackageName = packageName;
         }
 
         public static Package FromJProperty(JProperty property)
         {
             var splitted = property.Name.Split('/');
-            var package = new Package
-            {
-                Vendor = splitted[0],
-                PackageName = splitted[1],
-                Release = new Release
-                {
-                    Name = property.Value.ToString()
-                }
-            };
 
-            return package;
-        }
-
-        public static Package FromInstallOptions(InstallOptions options)
-        {
-            var package = new Package
-            {
-                Vendor = options.Vendor,
-                PackageName = options.PackageName,
-                Release = new Release
-                {
-                    Name = options.Release
-                }
-            };
-
-            return package;
+            return new Package(splitted[0], splitted[1], new Release {Name = property.Value.ToString()});
         }
 
         public override string ToString()

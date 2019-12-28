@@ -21,7 +21,7 @@ namespace LuaPackageOrganizer.Commands.Processes
 
         public void Execute(InstallOptions options)
         {
-            var package = Package.FromInstallOptions(options);
+            var package = new Package(options.Vendor, options.PackageName, new Release {Name = options.Release});
 
             try
             {
@@ -33,7 +33,6 @@ namespace LuaPackageOrganizer.Commands.Processes
                 {
                     Console.WriteLine($"{package} is already installed, ready for takeoff");
                 }
-                
             }
             catch (ReleaseNotFoundException e)
             {
