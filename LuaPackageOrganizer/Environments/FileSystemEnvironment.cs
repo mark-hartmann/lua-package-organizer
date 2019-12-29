@@ -146,5 +146,14 @@ namespace LuaPackageOrganizer.Environments
 
             return dependents.ToList();
         }
+
+        public List<Package> GetRemovableDependencies(Package package)
+        {
+            var dependencies = GetDependencies(package);
+
+            return dependencies.Count == 0
+                ? new List<Package>()
+                : dependencies.Where(dependency => GetDependents(dependency).Count == 1).ToList();
+        }
     }
 }
