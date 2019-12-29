@@ -27,7 +27,7 @@ namespace LuaPackageOrganizer.Environments
 
             LupoJson = LuaPackageOrganizer.LupoJsonFile.ParseFile(LupoJsonFile);
             _installedPackages = new Dictionary<Package, LupoJsonFile>();
-            
+
             ReadInstalledPackages();
         }
 
@@ -116,6 +116,35 @@ namespace LuaPackageOrganizer.Environments
                         : null;
                 }
             }
+        }
+
+        public List<Package> GetDependencies(Package package)
+        {
+            var c = _installedPackages.Count(p => p.Key.FullName == package.FullName);
+            if (_installedPackages.Count(p => p.Key.FullName.Equals(package.FullName)) == 0)
+                throw new Exception($"{package} is not installed!");
+
+            foreach (var (installedPackage, lupoJsonFile) in _installedPackages)
+            {
+                if (!installedPackage.FullName.Equals(package.FullName) || lupoJsonFile == null)
+                    continue;
+
+                return lupoJsonFile.Packages;
+            }
+
+            return new List<Package>();
+        }
+
+        public List<Package> GetDependents(Package package)
+        {
+            // Queries all installed packages requirements and returns those where the passed package is a requirement
+            // Linq is awesome!
+            var dependents =
+                from p in _installedPackages
+                where p.Value != null && (from d in p.Value.Packages select d.FullName).Contains(package.FullName)
+                select p.Key;
+
+            return dependents.ToList();
         }
     }
 }
