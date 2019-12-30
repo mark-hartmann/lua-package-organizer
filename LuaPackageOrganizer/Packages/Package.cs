@@ -2,7 +2,7 @@
 
 namespace LuaPackageOrganizer.Packages
 {
-    public class Package
+    public struct Package
     {
         public string Vendor { get; }
         public string PackageName { get; }
