@@ -95,6 +95,14 @@ namespace LuaPackageOrganizer.Environments
             LupoJson.AddPackage(package);
         }
 
+        public void UninstallPackage(Package package)
+        {
+            Console.WriteLine($"{package} is being uninstalled");
+            
+            var installationDirectory = GetInstallationDirectoryFor(package);
+            Directory.Delete(installationDirectory, true);
+        }
+
         private string GetInstallationDirectoryFor(Package package)
         {
             return Path.Join(VendorDirectory, package.Vendor, package.PackageName);

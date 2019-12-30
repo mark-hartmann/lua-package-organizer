@@ -29,7 +29,7 @@ namespace LuaPackageOrganizer
             }
         }
 
-        public bool IsModified => _addedPackages.Count > 0;
+        public bool IsModified => _addedPackages.Count > 0 || _state["packages"].Count() != _initialPackages.Count;
 
         private LupoJsonFile(string source)
         {
@@ -44,13 +44,25 @@ namespace LuaPackageOrganizer
             _addedPackages.Add(package);
         }
 
+        public void RemovePackage(Package package)
+        {
+            var index = _initialPackages.IndexOf(package);
+            if (index == -1)
+                return;
+
+            _initialPackages.RemoveAt(index);
+        }
+
         public void WriteChanges()
         {
             if (!IsModified)
                 return;
 
-            foreach (var package in _addedPackages)
-                _state["packages"][package.FullName] = package.Release.Name;
+            var packages = new JObject();
+            foreach (var package in Packages)
+                packages[package.FullName] = package.Release.Name;
+
+            _state["packages"] = packages;
 
             File.WriteAllText(_source, _state.ToString());
         }
