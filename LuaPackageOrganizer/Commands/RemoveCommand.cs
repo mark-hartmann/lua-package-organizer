@@ -6,7 +6,7 @@ using LuaPackageOrganizer.Packages;
 
 namespace LuaPackageOrganizer.Commands
 {
-    public class RemoveProcess
+    public class RemoveCommand
     {
         public void Execute(RemoveOptions options)
         {

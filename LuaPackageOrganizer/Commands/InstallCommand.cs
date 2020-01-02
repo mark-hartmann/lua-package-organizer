@@ -6,12 +6,12 @@ using LuaPackageOrganizer.Packages.Repositories;
 
 namespace LuaPackageOrganizer.Commands
 {
-    public class InstallProcess
+    public class InstallCommand
     {
         private readonly GithubRepository _repository;
         private readonly FileSystemEnvironment _environment;
 
-        public InstallProcess()
+        public InstallCommand()
         {
             _repository = new GithubRepository();
 
