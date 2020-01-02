@@ -24,10 +24,8 @@ namespace LuaPackageOrganizer.Packages.Repositories
 
         public bool PackageExists(Package package)
         {
-            using (var client = new WebClient())
+            using (var client = CreateWebClient())
             {
-                client.Headers.Add("user-agent", GithubUserAgent);
-
                 try
                 {
                     // If this throws a WebException, the request failed (probably 404), so it could be guessed that if
@@ -73,9 +71,8 @@ namespace LuaPackageOrganizer.Packages.Repositories
             }
 
             List<Release> releases;
-            using (var client = new WebClient())
+            using (var client = CreateWebClient())
             {
-                client.Headers.Add("user-agent", GithubUserAgent);
                 // todo: What happens if there are no releases for this package or no package at all? 
                 var jsonResponse =
                     client.DownloadString(string.Format(PackageReleasesUri, package.Vendor, package.PackageName));
@@ -94,7 +91,7 @@ namespace LuaPackageOrganizer.Packages.Repositories
             var downloadUri = new Uri(string.Format(PackageDownloadUri, package.Vendor, package.PackageName,
                 package.Release.Name));
 
-            using var client = new WebClient();
+            using var client = CreateWebClient();
 
             Console.Write($"+ Downloading {package} from {RepositoryName}: ");
             client.DownloadFileAsync(downloadUri, tempFile);
@@ -107,6 +104,14 @@ namespace LuaPackageOrganizer.Packages.Repositories
             Console.WriteLine("- Done.");
 
             ZipExtractor.ExtractTo(tempFile, packageDirectory);
+        }
+
+        private static WebClient CreateWebClient()
+        {
+            var client = new WebClient();
+            client.Headers.Add("user-agent", GithubUserAgent);
+
+            return client;
         }
     }
 }
