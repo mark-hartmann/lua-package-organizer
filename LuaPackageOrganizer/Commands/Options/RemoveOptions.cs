@@ -1,6 +1,6 @@
 ﻿using CommandLine;
 
-namespace LuaPackageOrganizer.Commands
+namespace LuaPackageOrganizer.Commands.Options
 {
     [Verb("remove", HelpText = "removes a package from your project")]
     public class RemoveOptions

@@ -1,9 +1,10 @@
 ﻿using System;
+using LuaPackageOrganizer.Commands.Options;
 using LuaPackageOrganizer.Environments;
 using LuaPackageOrganizer.Packages;
 using LuaPackageOrganizer.Packages.Repositories;
 
-namespace LuaPackageOrganizer.Commands.Processes
+namespace LuaPackageOrganizer.Commands
 {
     public class InstallProcess
     {

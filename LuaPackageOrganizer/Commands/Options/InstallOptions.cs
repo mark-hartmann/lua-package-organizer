@@ -1,6 +1,6 @@
 ﻿using CommandLine;
 
-namespace LuaPackageOrganizer.Commands
+namespace LuaPackageOrganizer.Commands.Options
 {
     [Verb("install", HelpText = "Install a package to your project")]
     public class InstallOptions

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Linq;
+using LuaPackageOrganizer.Commands.Options;
 using LuaPackageOrganizer.Environments;
 using LuaPackageOrganizer.Packages;
 
-namespace LuaPackageOrganizer.Commands.Processes
+namespace LuaPackageOrganizer.Commands
 {
     public class RemoveProcess
     {

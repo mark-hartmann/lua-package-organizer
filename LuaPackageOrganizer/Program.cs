@@ -1,7 +1,7 @@
 ﻿using System;
 using CommandLine;
 using LuaPackageOrganizer.Commands;
-using LuaPackageOrganizer.Commands.Processes;
+using LuaPackageOrganizer.Commands.Options;
 
 namespace LuaPackageOrganizer
 {
