@@ -128,7 +128,6 @@ namespace LuaPackageOrganizer.Environments
 
         public List<Package> GetDependencies(Package package)
         {
-            var c = _installedPackages.Count(p => p.Key.FullName == package.FullName);
             if (_installedPackages.Count(p => p.Key.FullName.Equals(package.FullName)) == 0)
                 throw new Exception($"{package} is not installed!");
 
