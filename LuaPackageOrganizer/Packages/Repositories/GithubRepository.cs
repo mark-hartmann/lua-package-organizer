@@ -15,8 +15,6 @@ namespace LuaPackageOrganizer.Packages.Repositories
         private const string PackageReleasesUri = "https://api.github.com/repos/{0}/{1}/tags";
         private const string PackageDownloadUri = "https://github.com/{0}/{1}/zipball/{2}";
 
-        private const string RepositoryName = "Github";
-
         public GithubRepository()
         {
             _releaseCache = new Dictionary<Package, List<Release>>();
@@ -91,18 +89,18 @@ namespace LuaPackageOrganizer.Packages.Repositories
             var downloadUri = new Uri(string.Format(PackageDownloadUri, package.Vendor, package.PackageName,
                 package.Release.Name));
 
+            var progress = 0;
             using var client = CreateWebClient();
-
-            Console.Write($"+ Downloading {package} from {RepositoryName}: ");
+            client.DownloadProgressChanged += (s, e) => progress = e.ProgressPercentage;
             client.DownloadFileAsync(downloadUri, tempFile);
 
-            // While the package is downloading, display a spinner to indicate that something is happening
-            while (client.IsBusy)
+            using (var progressbar = new ProgressBar())
             {
+                while (client.IsBusy)
+                    progressbar.Refresh(progress, $"Downloading {package.FullName} @ {package.Release.Name}");
             }
 
-            Console.WriteLine("- Done.");
-
+            Console.WriteLine();
             ZipExtractor.ExtractTo(tempFile, packageDirectory);
         }
 
