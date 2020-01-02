@@ -2,7 +2,6 @@
 using System.Linq;
 using LuaPackageOrganizer.Commands.Options;
 using LuaPackageOrganizer.Environments;
-using LuaPackageOrganizer.Packages;
 
 namespace LuaPackageOrganizer.Commands
 {
@@ -10,33 +9,38 @@ namespace LuaPackageOrganizer.Commands
     {
         public void Execute(RemoveOptions options)
         {
-            var package = new Package(options.Vendor, options.PackageName, new Release());
             var environment = FileSystemEnvironment.Local();
 
-            if (!environment.PackageAlreadyInstalled(package))
+            try
             {
-                Console.WriteLine("Nothing can be removed that is not there");
-                return;
-            }
+                var package = environment.LupoJson.Packages.FirstOrDefault(p => p.FullName == options.Package);
 
-            var removablePackages = environment.GetRemovableDependencies(package);
-            if (removablePackages.Count != 0)
-            {
-                Console.WriteLine($"{removablePackages.Count} no longer needed package(s) can also be uninstalled.");
+                if (package.PackageName == null)
+                    throw new Exception($"{options.Package} is not installed and therefore not removable");
 
-                foreach (var removablePackage in removablePackages)
+                var removablePackages = environment.GetRemovableDependencies(package);
+                if (removablePackages.Count != 0)
                 {
-                    environment.UninstallPackage(removablePackage);
+                    Console.WriteLine($"{removablePackages.Count} no longer needed package(s) can also be uninstalled");
+
+                    foreach (var removablePackage in removablePackages)
+                    {
+                        environment.UninstallPackage(removablePackage);
+                    }
                 }
+
+                environment.UninstallPackage(package);
+
+                environment.LupoJson.RemovePackage(package);
+                environment.LupoJson.WriteChanges();
+
+                Console.WriteLine("Done.");
             }
-
-            environment.LupoJson.RemovePackage(
-                environment.LupoJson.Packages.First(p => p.FullName == package.FullName));
-            
-            environment.UninstallPackage(package);
-            environment.LupoJson.WriteChanges();
-
-            Console.WriteLine("Done.");
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
     }
 }
