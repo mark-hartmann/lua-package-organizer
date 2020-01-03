@@ -54,51 +54,25 @@ namespace LuaPackageOrganizer.Environments
 
         public void InstallPackage(Package package, IRepository repository)
         {
-            var installationQueue = new Queue<Package>();
-            installationQueue.Enqueue(package);
+            if (repository.PackageExists(package) == false)
+                throw new PackageNotFoundException(package);
 
-            while (installationQueue.Count != 0)
-            {
-                var installingPackage = installationQueue.Dequeue();
+            if (repository.IsReleaseAvailable(package, package.Release) == false)
+                throw new ReleaseNotFoundException(package);
 
-                if (repository.PackageExists(installingPackage) == false)
-                    throw new PackageNotFoundException(package);
+            repository.DownloadFiles(package, GetInstallationDirectoryFor(package));
 
-                if (repository.IsReleaseAvailable(installingPackage, installingPackage.Release) == false)
-                    throw new ReleaseNotFoundException(package);
+            var lupoFile = Path.Join(GetInstallationDirectoryFor(package), "lupo.json");
 
-                repository.DownloadFiles(installingPackage, GetInstallationDirectoryFor(installingPackage));
-
-                var lupoFile = Path.Join(GetInstallationDirectoryFor(installingPackage), "lupo.json");
-
-                if (!File.Exists(lupoFile))
-                {
-                    _installedPackages[installingPackage] = null;
-                    continue;
-                }
-
-                _installedPackages[installingPackage] = LuaPackageOrganizer.LupoJsonFile.ParseFile(lupoFile);
-                foreach (var requirement in _installedPackages[installingPackage].Packages)
-                {
-                    if (PackageAlreadyInstalled(requirement) == false)
-                    {
-                        installationQueue.Enqueue(requirement);
-                        Console.WriteLine($"- {requirement} needs to be installed.");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"- {requirement} already satisfied.");
-                    }
-                }
-            }
-
-            LupoJson.AddPackage(package);
+            _installedPackages[package] = File.Exists(lupoFile)
+                ? LuaPackageOrganizer.LupoJsonFile.ParseFile(lupoFile)
+                : null;
         }
 
         public void UninstallPackage(Package package)
         {
             Console.WriteLine($"{package} is being uninstalled");
-            
+
             var installationDirectory = GetInstallationDirectoryFor(package);
             Directory.Delete(installationDirectory, true);
         }
