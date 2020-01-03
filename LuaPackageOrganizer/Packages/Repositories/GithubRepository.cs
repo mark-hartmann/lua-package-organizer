@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace LuaPackageOrganizer.Packages.Repositories
 {
@@ -14,6 +16,7 @@ namespace LuaPackageOrganizer.Packages.Repositories
         private const string PackageDetailsUri = "https://api.github.com/repos/{0}/{1}";
         private const string PackageReleasesUri = "https://api.github.com/repos/{0}/{1}/tags";
         private const string PackageDownloadUri = "https://github.com/{0}/{1}/zipball/{2}";
+        private const string PackageDependenciesUri = "https://raw.githubusercontent.com/{0}/{1}/{2}/lupo.json";
 
         public GithubRepository()
         {
@@ -81,6 +84,36 @@ namespace LuaPackageOrganizer.Packages.Repositories
             _releaseCache.Add(package, releases);
 
             return releases;
+        }
+
+        public static List<Package> GetRequiredPackages(Package package)
+        {
+            var requirements = new List<Package>();
+            var totalRequirements = new List<Package>();
+
+            try
+            {
+                using var client = CreateWebClient();
+
+                var uri = string.Format(PackageDependenciesUri, package.Vendor, package.PackageName,
+                    package.Release.Name);
+                var response = client.DownloadString(uri);
+
+                foreach (var jToken in JObject.Parse(response)["packages"].ToList())
+                    requirements.Add(Package.FromJProperty((JProperty) jToken));
+
+                totalRequirements.AddRange(requirements);
+                foreach (var requirement in requirements)
+                {
+                    totalRequirements.AddRange(GetRequiredPackages(requirement));
+                }
+
+                return totalRequirements;
+            }
+            catch (Exception)
+            {
+                return requirements;
+            }
         }
 
         public void DownloadFiles(Package package, string packageDirectory)
