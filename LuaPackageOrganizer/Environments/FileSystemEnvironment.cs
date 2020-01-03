@@ -130,11 +130,39 @@ namespace LuaPackageOrganizer.Environments
 
         public List<Package> GetRemovableDependencies(Package package)
         {
-            var dependencies = GetDependencies(package);
+            var removablePackages = new List<Package>();
+            var recursiveDependencies = GetDependenciesRecursive(package);
 
-            return dependencies.Count == 0
-                ? new List<Package>()
-                : dependencies.Where(dependency => GetDependents(dependency).Count == 1).ToList();
+            foreach (var dependency in recursiveDependencies)
+            {
+                var dependents = GetDependents(dependency);
+
+                foreach (var dependent in dependents)
+                {
+                    var isAlreadyInList = removablePackages.Contains(dependency);
+                    var isRequiredByProject = LupoJson.Packages.Contains(dependency);
+                    var isItselfRemovableDependency = recursiveDependencies.Contains(dependent);
+
+                    if (!isAlreadyInList && !isRequiredByProject && !isItselfRemovableDependency)
+                        removablePackages.Add(dependency);
+                }
+            }
+
+            return removablePackages;
+        }
+
+        private List<Package> GetDependenciesRecursive(Package package)
+        {
+            var dependencies = GetDependencies(package);
+            var allDependencies = new List<Package>();
+
+            foreach (var dependency in dependencies)
+            {
+                allDependencies.Add(dependency);
+                allDependencies.AddRange(GetDependenciesRecursive(dependency));
+            }
+
+            return allDependencies.Distinct().ToList();
         }
     }
 }
