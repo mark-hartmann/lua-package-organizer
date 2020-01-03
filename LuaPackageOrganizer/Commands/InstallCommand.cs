@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using LuaPackageOrganizer.Commands.Options;
 using LuaPackageOrganizer.Environments;
 using LuaPackageOrganizer.Packages;
@@ -31,12 +32,16 @@ namespace LuaPackageOrganizer.Commands
                 {
                     // todo: Check if the dependencies are broken (Same package w/ different Releases) 
                     var packages = new List<Package>(GithubRepository.GetRequiredPackages(package)) {package};
-                    
+                    var installationRequired = packages.Where(p => !_environment.PackageAlreadyInstalled(p)).ToList();
+
                     Console.WriteLine($"{packages.Count} packages will now be installed");
 
-                    foreach (var pkg in packages)
+                    foreach (var satisfied in packages.Where(p => _environment.PackageAlreadyInstalled(p)).ToList())
+                        Console.WriteLine($"{satisfied.FullName} @ {satisfied.Release.Name} already installed");
+
+                    foreach (var pkg in installationRequired)
                         _environment.InstallPackage(pkg, _repository);
-                    
+
                     _environment.LupoJson.AddPackage(package);
                 }
                 else

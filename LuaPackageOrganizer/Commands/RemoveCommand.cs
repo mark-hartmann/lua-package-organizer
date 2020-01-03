@@ -38,8 +38,7 @@ namespace LuaPackageOrganizer.Commands
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                throw;
+                Console.WriteLine(e.Message);
             }
         }
     }
