@@ -39,17 +39,7 @@ namespace LuaPackageOrganizer.Environments
 
         public bool PackageAlreadyInstalled(Package package)
         {
-            var foundPackages = LupoJson.Packages.Where(p => p.FullName == package.FullName).ToList();
-
-            if (foundPackages.Count == 0)
-                return false;
-
-            // Checks if there the passed package was previously installed with a different version. This only works if
-            // the releases name is not null
-            if (package.Release.Name != null && !foundPackages.Any(p => p.Release.Equals(package.Release)))
-                throw new Exception($"{package.FullName} installed with a different version ({package.Release.Name})");
-
-            return true;
+            return _installedPackages.Count(p => p.Key.FullName == package.FullName) != 0;
         }
 
         public void InstallPackage(Package package, IRepository repository)
@@ -57,8 +47,8 @@ namespace LuaPackageOrganizer.Environments
             if (repository.PackageExists(package) == false)
                 throw new PackageNotFoundException(package);
 
-            if (repository.IsReleaseAvailable(package, package.Release) == false)
-                throw new ReleaseNotFoundException(package);
+            // if (repository.IsReleaseAvailable(package, package.Release) == false)
+            //     throw new ReleaseNotFoundException(package);
 
             repository.DownloadFiles(package, GetInstallationDirectoryFor(package));
 

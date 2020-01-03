@@ -21,7 +21,10 @@ namespace LuaPackageOrganizer.Commands.Options
             }
         }
 
-        [Value(1, MetaName = "release", HelpText = "The release you want to install", Required = true)]
+        [Value(1, MetaName = "release", HelpText = "The release you want to install", Required = false)]
         public string Release { get; set; }
+
+        [Option("no-release", Default = false)]
+        public bool UseActiveBranch { get; set; }
     }
 }

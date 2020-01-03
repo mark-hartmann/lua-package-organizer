@@ -86,7 +86,7 @@ namespace LuaPackageOrganizer.Packages.Repositories
             return releases;
         }
 
-        public static List<Package> GetRequiredPackages(Package package)
+        public List<Package> GetRequiredPackages(Package package)
         {
             var requirements = new List<Package>();
             var totalRequirements = new List<Package>();
@@ -143,6 +143,22 @@ namespace LuaPackageOrganizer.Packages.Repositories
             client.Headers.Add("user-agent", GithubUserAgent);
 
             return client;
+        }
+
+        public Release GetLatestRelease(Package package, bool useDefaultBranch)
+        {
+            if (!useDefaultBranch && GetAvailableReleases(package).Count == 0)
+                throw new Exception(
+                    $"{package.FullName} has no releases, you may want to use --no-release");
+
+            if (!useDefaultBranch && GetAvailableReleases(package).Count != 0)
+                return GetAvailableReleases(package).First();
+
+            using var client = CreateWebClient();
+            var uri = string.Format(PackageDetailsUri, package.Vendor, package.PackageName);
+            var response = JObject.Parse(client.DownloadString(uri));
+
+            return new Release {Name = response["default_branch"].ToString()};
         }
     }
 }

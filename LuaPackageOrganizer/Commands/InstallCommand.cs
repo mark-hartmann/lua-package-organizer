@@ -26,27 +26,45 @@ namespace LuaPackageOrganizer.Commands
         {
             var package = new Package(options.Vendor, options.PackageName, new Release {Name = options.Release});
 
+            if (package.Release.Name == null)
+            {
+                // This is a neat one, if the user tried to install a package without release it checks if the
+                // --no-release flag was set. If so, the package will use the projects active branch, otherwise
+                // the latest available release will be installed 
+                var latestRelease = _repository.GetLatestRelease(package, options.UseActiveBranch);
+                package = new Package(package.Vendor, package.PackageName, latestRelease);
+
+                Console.WriteLine(
+                    options.UseActiveBranch
+                        ? $"Warning: {package.FullName} will use {package.Release.Name}, this may not be a good idea!"
+                        : $"Using latest release ({package.Release.Name}) for {package.FullName}");
+            }
+
             try
             {
-                if (_environment.PackageAlreadyInstalled(package) == false)
+                if (_environment.LupoJson.Packages.Contains(package) == false)
                 {
                     // todo: Check if the dependencies are broken (Same package w/ different Releases) 
-                    var packages = new List<Package>(GithubRepository.GetRequiredPackages(package)) {package};
+                    var packages = new List<Package>(_repository.GetRequiredPackages(package)) {package};
                     var installationRequired = packages.Where(p => !_environment.PackageAlreadyInstalled(p)).ToList();
 
                     Console.WriteLine($"{packages.Count} packages will now be installed");
 
                     foreach (var satisfied in packages.Where(p => _environment.PackageAlreadyInstalled(p)).ToList())
-                        Console.WriteLine($"{satisfied.FullName} @ {satisfied.Release.Name} already installed");
+                    {
+                        Console.WriteLine($"{satisfied.FullName} @ {satisfied.Release.Name} is already installed");
+                    }
 
                     foreach (var pkg in installationRequired)
+                    {
                         _environment.InstallPackage(pkg, _repository);
+                    }
 
                     _environment.LupoJson.AddPackage(package);
                 }
                 else
                 {
-                    Console.WriteLine($"{package} is already installed, ready for takeoff");
+                    Console.WriteLine($"{package} is already installed");
                 }
             }
             catch (ReleaseNotFoundException e)
@@ -91,7 +109,7 @@ namespace LuaPackageOrganizer.Commands
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Console.WriteLine(e.Message);
             }
 
             // If the environment was modified, the content of the lupo.json file gets overwritten with the newly
