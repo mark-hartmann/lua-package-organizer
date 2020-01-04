@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using LuaPackageOrganizer.Packages;
-using LuaPackageOrganizer.Packages.Repositories;
 using Newtonsoft.Json.Linq;
 
 namespace LuaPackageOrganizer
@@ -17,7 +16,7 @@ namespace LuaPackageOrganizer
             _source = source;
         }
 
-        public void LockPackage(Package package, GithubRepository responsibleRepository)
+        public void LockPackage(Package package, IRepository responsibleRepository)
         {
             var node = new JObject()
             {
