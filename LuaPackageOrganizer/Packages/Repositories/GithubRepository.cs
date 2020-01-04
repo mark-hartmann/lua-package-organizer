@@ -10,7 +10,7 @@ namespace LuaPackageOrganizer.Packages.Repositories
 {
     public class GithubRepository : IRepository
     {
-        private Dictionary<Package, List<Release>> _releaseCache;
+        private readonly Dictionary<Package, List<Release>> _releaseCache;
 
         private const string GithubUserAgent = "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)";
         private const string PackageDetailsUri = "https://api.github.com/repos/{0}/{1}";
