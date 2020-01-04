@@ -116,6 +116,29 @@ namespace LuaPackageOrganizer.Packages.Repositories
             }
         }
 
+        public List<Package> GetDependencies(Package package)
+        {
+            var dependencies = new List<Package>();
+
+            try
+            {
+                using var client = CreateWebClient();
+
+                var uri = string.Format(PackageDependenciesUri, package.Vendor, package.PackageName,
+                    package.Release.Name);
+                var response = client.DownloadString(uri);
+
+                foreach (var jToken in JObject.Parse(response)["packages"].ToList())
+                    dependencies.Add(Package.FromJProperty((JProperty) jToken));
+
+                return dependencies;
+            }
+            catch (Exception)
+            {
+                return dependencies;
+            }
+        }
+
         public void DownloadFiles(Package package, string packageDirectory)
         {
             var tempFile = Path.GetTempFileName(); // Creates a temporary file to write the zip to
