@@ -9,7 +9,6 @@ namespace LuaPackageOrganizer
     public class LupoLockFile
     {
         private JObject _state;
-        private JObject _initialState;
         private readonly string _source;
 
         private LupoLockFile(string source)
@@ -84,20 +83,47 @@ namespace LuaPackageOrganizer
             return dependents;
         }
 
+        public List<Package> GetRemovableDependencies(Package package)
+        {
+            List<Package> GetDependenciesRecursive(Package pkg)
+            {
+                var packages = GetDependencies(pkg);
+                var dependencies = new List<Package>();
+
+                foreach (var dependency in packages)
+                {
+                    dependencies.Add(dependency);
+                    dependencies.AddRange(GetDependenciesRecursive(dependency));
+                }
+
+                return dependencies.Distinct().ToList();
+            }
+
+            var allDependencies = GetDependenciesRecursive(package);
+            var removableDependencies = new List<Package>();
+
+            foreach (var dependency in allDependencies)
+            {
+                // If a dependency itself has another constraint/dependent that is NOT in the recursive dependencies, it
+                // must not be removed as it is used by another package 
+                var dependents = GetDependents(dependency);
+                var hasDependentOutside = dependents.Any(d => !allDependencies.Contains(d) && !d.Equals(package));
+
+                if (!hasDependentOutside)
+                    removableDependencies.Add(dependency);
+            }
+
+            return removableDependencies;
+        }
+
         public static LupoLockFile ParseFile(string path)
         {
-            var instance = new LupoLockFile(path);
-
-            if (!File.Exists(path))
+            var instance = new LupoLockFile(path)
             {
-                instance._state = new JObject {["packages"] = new JArray()};
-                instance._initialState = new JObject {["packages"] = new JArray()};
-            }
-            else
-            {
-                instance._state = JObject.Parse(File.ReadAllText(path));
-                instance._initialState = JObject.Parse(File.ReadAllText(path));
-            }
+                _state = !File.Exists(path)
+                    ? new JObject {["packages"] = new JArray()}
+                    : JObject.Parse(File.ReadAllText(path))
+            };
 
             return instance;
         }
