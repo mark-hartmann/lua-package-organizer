@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using LuaPackageOrganizer.Packages;
 using LuaPackageOrganizer.Packages.Repositories;
 using Newtonsoft.Json.Linq;
@@ -31,6 +32,22 @@ namespace LuaPackageOrganizer
                 node["packages"][dependency.FullName] = dependency.Release.Name;
 
             ((JArray) _state["packages"]).Add(node);
+        }
+
+        public List<Package> GetPackages()
+        {
+            var list = new List<Package>();
+
+            foreach (var node in (JArray) _state["packages"])
+            {
+                var splitted = ((string) node["name"]).Split('/');
+                list.Add(new Package(splitted[0], splitted[1], new Release
+                {
+                    Name = (string) node["release"]
+                }));
+            }
+
+            return list;
         }
 
         public static LupoLockFile ParseFile(string path)
