@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using LuaPackageOrganizer.Packages;
 using Newtonsoft.Json.Linq;
 
@@ -33,7 +34,7 @@ namespace LuaPackageOrganizer
             ((JArray) _state["packages"]).Add(node);
         }
 
-        public List<Package> GetPackages()
+        public IEnumerable<Package> GetPackages()
         {
             var list = new List<Package>();
 
@@ -47,6 +48,40 @@ namespace LuaPackageOrganizer
             }
 
             return list;
+        }
+
+        public IEnumerable<Package> GetDependencies(Package package)
+        {
+            var dependencies = new List<Package>();
+
+            foreach (var node in (JArray) _state["packages"])
+            {
+                if ((string) node["name"] != package.FullName)
+                    continue;
+
+                dependencies.AddRange(node["packages"].Select(pkgNode => Package.FromJProperty((JProperty) pkgNode)));
+            }
+
+            return dependencies;
+        }
+
+        public IEnumerable<Package> GetDependents(Package package)
+        {
+            var dependents = new List<Package>();
+
+            foreach (var node in (JArray) _state["packages"])
+            {
+                if (node["packages"].All(n => ((JProperty) n).Name != package.FullName))
+                    continue;
+
+                var splitted = ((string) node["name"]).Split('/');
+                dependents.Add(new Package(splitted[0], splitted[1], new Release
+                {
+                    Name = (string) node["release"]
+                }));
+            }
+
+            return dependents;
         }
 
         public static LupoLockFile ParseFile(string path)
