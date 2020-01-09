@@ -33,6 +33,18 @@ namespace LuaPackageOrganizer
             ((JArray) _state["packages"]).Add(node);
         }
 
+        public void UnlockPackage(Package package)
+        {
+            JToken toRemove = null;
+            foreach (var node in (JArray) _state["packages"])
+            {
+                if ((string) node["name"] == package.FullName)
+                    toRemove = node;
+            }
+
+            toRemove?.Remove();
+        }
+
         public IEnumerable<Package> GetPackages()
         {
             var list = new List<Package>();
