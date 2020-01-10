@@ -54,7 +54,6 @@ namespace LuaPackageOrganizer.Environments
 
         public void UninstallPackage(Package package)
         {
-            Console.WriteLine($"{package} is being uninstalled");
             Directory.Delete(GetInstallationDirectoryFor(package), true);
         }
 

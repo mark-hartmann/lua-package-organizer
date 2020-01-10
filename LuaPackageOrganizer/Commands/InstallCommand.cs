@@ -51,14 +51,10 @@ namespace LuaPackageOrganizer.Commands
                     Console.WriteLine($"{packages.Count} packages will now be installed");
 
                     foreach (var satisfied in packages.Where(p => _environment.PackageAlreadyInstalled(p)).ToList())
-                    {
-                        Console.WriteLine($"{satisfied.FullName} @ {satisfied.Release.Name} is already installed");
-                    }
+                        Console.WriteLine($"{satisfied.FullName} @ {satisfied.Release.Name} is already satisfied");
 
                     foreach (var pkg in installationRequired)
-                    {
                         _environment.InstallPackage(pkg, _repository);
-                    }
 
                     _environment.LupoJson.AddPackage(package);
                 }
@@ -115,7 +111,10 @@ namespace LuaPackageOrganizer.Commands
             // If the environment was modified, the content of the lupo.json file gets overwritten with the newly
             // installed package
             if (_environment.LupoJson.IsModified)
+            {
                 _environment.LupoJson.WriteChanges();
+                _environment.LupoLock.WriteChanges();
+            }
 
             // If the environment was modified (added folders) but failed during the installation process, the mess must
             // be cleaned and set back to the initial state
