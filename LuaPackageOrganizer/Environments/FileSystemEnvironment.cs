@@ -12,8 +12,8 @@ namespace LuaPackageOrganizer.Environments
         private string LupoJsonFile { get; }
         private string LupoLockFile { get; }
         private string VendorDirectory { get; }
-        
-        private FileSystemEnvironment(string root)
+
+        public FileSystemEnvironment(string root)
         {
             LupoJsonFile = Path.Join(root, "lupo.json");
             LupoLockFile = Path.Join(root, "lupo.lock");
@@ -31,8 +31,7 @@ namespace LuaPackageOrganizer.Environments
 
         public static FileSystemEnvironment Local()
         {
-            // todo: Change to Directory.GetCurrentDirectory()
-            return new FileSystemEnvironment(@"C:\Users\markh\IdeaProjects\LupoTestPackage");
+            return new FileSystemEnvironment(Directory.GetCurrentDirectory());
         }
 
         public bool PackageAlreadyInstalled(Package package)

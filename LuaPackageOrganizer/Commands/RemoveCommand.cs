@@ -9,7 +9,9 @@ namespace LuaPackageOrganizer.Commands
     {
         public void Execute(RemoveOptions options)
         {
-            var environment = FileSystemEnvironment.Local();
+            var environment = options.ProjectDirectory == null
+                ? FileSystemEnvironment.Local()
+                : new FileSystemEnvironment(options.ProjectDirectory);
 
             try
             {
@@ -29,22 +31,22 @@ namespace LuaPackageOrganizer.Commands
                 // and remains in the lupo.lock file 
                 var hasDependents = environment.LupoLock.GetDependents(package).Any();
                 var hasRemovablePackages = removablePackages.Count != 0;
-                
+
                 if (hasRemovablePackages)
                 {
                     Console.WriteLine($"{removablePackages.Count} no longer needed package(s) can also be uninstalled");
-                    
+
                     foreach (var removablePackage in removablePackages)
                     {
                         // If the dependency is also a required by this project, skip
-                        if (environment.LupoJson.Packages.Contains(removablePackage)) 
+                        if (environment.LupoJson.Packages.Contains(removablePackage))
                             continue;
-                        
+
                         Console.Write($"Removing dependency {removablePackage.FullName}: ");
-                            
+
                         environment.UninstallPackage(removablePackage);
                         environment.LupoLock.UnlockPackage(removablePackage);
-                            
+
                         Console.WriteLine("Done");
                     }
                 }
@@ -56,7 +58,7 @@ namespace LuaPackageOrganizer.Commands
                 }
 
                 Console.Write($"Removing package {package.FullName}: ");
-                
+
                 environment.LupoJson.RemovePackage(package);
 
                 environment.LupoJson.WriteChanges();

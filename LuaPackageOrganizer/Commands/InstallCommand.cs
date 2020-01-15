@@ -10,20 +10,20 @@ namespace LuaPackageOrganizer.Commands
 {
     public class InstallCommand
     {
-        private readonly GithubRepository _repository;
-        private readonly FileSystemEnvironment _environment;
+        private GithubRepository _repository;
+        private FileSystemEnvironment _environment;
 
         public InstallCommand()
         {
             _repository = new GithubRepository();
-
-            // Creates a local environment (current project). Later there should be something like a "global"
-            // environment to be able to access installed packages from different projects
-            _environment = FileSystemEnvironment.Local();
         }
 
         public void Execute(InstallOptions options)
         {
+            _environment = options.ProjectDirectory == null
+                ? FileSystemEnvironment.Local()
+                : new FileSystemEnvironment(options.ProjectDirectory);
+
             var package = new Package(options.Vendor, options.PackageName, new Release {Name = options.Release});
 
             if (package.Release.Name == null)
