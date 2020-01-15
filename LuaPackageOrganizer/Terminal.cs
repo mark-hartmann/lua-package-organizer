@@ -36,6 +36,5 @@ namespace LuaPackageOrganizer
 
     class Terminal
     {
-        
     }
 }
