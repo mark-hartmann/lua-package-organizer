@@ -36,8 +36,8 @@ namespace LuaPackageOrganizer.Commands
 
                 Console.WriteLine(
                     options.UseActiveBranch
-                        ? $"Warning: {package.FullName} will use {package.Release.Name}, this may not be a good idea!"
-                        : $"Using latest release ({package.Release.Name}) for {package.FullName}");
+                        ? $"Warning: {package.FullName} will use {package.Release}, this may not be a good idea!"
+                        : $"Using latest release ({package.Release}) for {package.FullName}");
             }
 
             try
@@ -51,7 +51,7 @@ namespace LuaPackageOrganizer.Commands
                     Console.WriteLine($"{packages.Count} packages will now be installed");
 
                     foreach (var satisfied in packages.Where(p => _environment.PackageAlreadyInstalled(p)).ToList())
-                        Console.WriteLine($"{satisfied.FullName} @ {satisfied.Release.Name} is already satisfied");
+                        Console.WriteLine($"{satisfied.FullName} @ {satisfied.Release} is already satisfied");
 
                     foreach (var pkg in installationRequired)
                         _environment.InstallPackage(pkg, _repository);

@@ -153,7 +153,7 @@ namespace LuaPackageOrganizer.Packages.Repositories
             using (var progressbar = new ProgressBar())
             {
                 while (client.IsBusy)
-                    progressbar.Refresh(progress, $"Downloading {package.FullName} @ {package.Release.Name}");
+                    progressbar.Refresh(progress, $"Downloading {package.FullName} @ {package.Release}");
             }
 
             Console.WriteLine();

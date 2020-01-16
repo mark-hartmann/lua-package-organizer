@@ -25,7 +25,7 @@ namespace LuaPackageOrganizer.Packages
 
         public override string ToString()
         {
-            return $"[Package: {Vendor}/{PackageName} @ Version: {Release.Name}]";
+            return $"[Package: {Vendor}/{PackageName} @ Version: {Release}]";
         }
     }
 }
