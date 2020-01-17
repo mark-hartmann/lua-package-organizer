@@ -17,22 +17,24 @@ namespace LuaPackageOrganizer.Environments
         {
             // If root is null the current working directory is used instead
             if (root == null)
-            {
                 root = Directory.GetCurrentDirectory();
-            }
 
             LupoJsonFile = Path.Join(root, "lupo.json");
             LupoLockFile = Path.Join(root, "lupo.lock");
             VendorDirectory = Path.Join(root, "vendor");
 
-            if (File.Exists(LupoJsonFile) != true)
-                throw new Exception("lupo.json does not exist");
-
-            if (Directory.Exists(VendorDirectory) != true)
-                throw new Exception("vendor directory does not exist");
+            VerifyProjectDirectory();
 
             LupoJson = LuaPackageOrganizer.LupoJsonFile.ParseFile(LupoJsonFile);
-            LupoLock = LuaPackageOrganizer.LupoLockFile.ParseFile(LupoLockFile);
+
+            if (File.Exists(LupoLockFile))
+                LupoLock = LuaPackageOrganizer.LupoLockFile.ParseFile(LupoLockFile);
+        }
+
+        private void VerifyProjectDirectory()
+        {
+            if (!File.Exists(LupoJsonFile))
+                throw new Exception("Project directory has not yet been initialized or is corrupted");
         }
 
         public static FileSystemEnvironment Local()
