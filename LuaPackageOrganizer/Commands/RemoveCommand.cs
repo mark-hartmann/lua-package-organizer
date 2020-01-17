@@ -9,9 +9,7 @@ namespace LuaPackageOrganizer.Commands
     {
         public void Execute(RemoveOptions options)
         {
-            var environment = options.ProjectDirectory == null
-                ? FileSystemEnvironment.Local()
-                : new FileSystemEnvironment(options.ProjectDirectory);
+            var environment = new FileSystemEnvironment(options.ProjectDirectory);
 
             try
             {

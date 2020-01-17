@@ -20,9 +20,7 @@ namespace LuaPackageOrganizer.Commands
 
         public void Execute(InstallOptions options)
         {
-            _environment = options.ProjectDirectory == null
-                ? FileSystemEnvironment.Local()
-                : new FileSystemEnvironment(options.ProjectDirectory);
+            _environment = new FileSystemEnvironment(options.ProjectDirectory);
 
             var package = new Package(options.Vendor, options.PackageName, new Release {Name = options.Release});
 

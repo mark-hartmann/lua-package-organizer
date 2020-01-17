@@ -15,6 +15,12 @@ namespace LuaPackageOrganizer.Environments
 
         public FileSystemEnvironment(string root)
         {
+            // If root is null the current working directory is used instead
+            if (root == null)
+            {
+                root = Directory.GetCurrentDirectory();
+            }
+
             LupoJsonFile = Path.Join(root, "lupo.json");
             LupoLockFile = Path.Join(root, "lupo.lock");
             VendorDirectory = Path.Join(root, "vendor");
