@@ -37,11 +37,6 @@ namespace LuaPackageOrganizer.Environments
                 throw new Exception("Project directory has not yet been initialized or is corrupted");
         }
 
-        public static FileSystemEnvironment Local()
-        {
-            return new FileSystemEnvironment(Directory.GetCurrentDirectory());
-        }
-
         public bool PackageAlreadyInstalled(Package package)
         {
             return LupoLock.GetPackages().Count(p => p.FullName == package.FullName) != 0;
