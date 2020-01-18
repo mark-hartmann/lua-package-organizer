@@ -23,7 +23,7 @@ namespace LuaPackageOrganizer.Packages.Repositories
             _releaseCache = new Dictionary<Package, List<Release>>();
         }
 
-        public bool PackageExists(Package package)
+        public bool HasPackage(Package package)
         {
             using (var client = CreateWebClient())
             {
