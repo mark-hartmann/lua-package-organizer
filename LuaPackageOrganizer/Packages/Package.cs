@@ -18,9 +18,9 @@ namespace LuaPackageOrganizer.Packages
 
         public static Package FromJProperty(JProperty property)
         {
-            var splitted = property.Name.Split('/');
+            var split = property.Name.Split('/');
 
-            return new Package(splitted[0], splitted[1], new Release {Name = property.Value.ToString()});
+            return new Package(split[0], split[1], new Release {Name = property.Value.ToString()});
         }
 
         public override string ToString()
