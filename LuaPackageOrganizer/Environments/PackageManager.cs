@@ -50,7 +50,11 @@ namespace LuaPackageOrganizer.Environments
 
         public void Uninstall(Package package, bool explicitly = false)
         {
-            throw new NotImplementedException();
+            _lupoLock.UnlockPackage(package);
+            // If the package is to be removed explicitly, the package gets removed from the lupo.json as well
+            if (explicitly) _lupoJson.RemovePackage(package);
+
+            Directory.Delete(InstallPath(package), true);
         }
 
         public void ApplyChanges()
