@@ -14,6 +14,8 @@ namespace LuaPackageOrganizer.Environments
         /// <returns></returns>
         public bool IsInstalled(Package package, bool explicitly = false);
 
+        public bool HasDependents(Package package);
+
         public void Install(Package package, IRepository repository, bool explicitly = false);
 
         /// <summary>

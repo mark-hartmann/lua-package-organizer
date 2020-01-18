@@ -30,6 +30,11 @@ namespace LuaPackageOrganizer.Environments
                 : _lupoLock.GetPackages().Any(p => p.FullName == package.FullName);
         }
 
+        public bool HasDependents(Package package)
+        {
+            return _lupoLock.GetDependents(package).Any();
+        }
+
         public void Install(Package package, IRepository repository, bool explicitly = false)
         {
             if (repository.HasPackage(package) == false)
