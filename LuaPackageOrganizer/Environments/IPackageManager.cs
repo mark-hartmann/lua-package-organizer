@@ -33,12 +33,10 @@ namespace LuaPackageOrganizer.Environments
         public void Install(Package package, IRepository repository, bool explicitly = false);
 
         /// <summary>
-        /// Removes a package. One must be sure the package is not required by any another package as this will remove
-        /// the lupo.lock (and if explicitly == true the lupo-json) entry as well as the packages local files  
+        /// Removes a package with all dependencies it has unless they are required by another package
         /// </summary>
         /// <param name="package"></param>
-        /// <param name="explicitly">If true, the package also gets removed from the lupo.json</param>
-        public void Uninstall(Package package, bool explicitly = false);
+        public void Uninstall(Package package);
 
         /// <summary>
         /// This finishes a change in the environment, meaning if a package was installed, this method persists the
