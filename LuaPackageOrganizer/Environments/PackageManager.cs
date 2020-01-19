@@ -55,15 +55,18 @@ namespace LuaPackageOrganizer.Environments
 
         public void Uninstall(Package package)
         {
-            var removablePackages =
-                _lupoLock.GetRemovableDependencies(package).Where(dep => !IsInstalled(dep, true));
+            // Recursively resolves all removable packages related to the package. Packets which were installed
+            // explicitly are ignored
+            var removablePackages = _lupoLock.GetRemovableDependencies(package)
+                .Where(dep => !IsInstalled(dep, true));
 
             foreach (var removablePackage in removablePackages)
             {
                 UninstallPackage(removablePackage);
             }
 
-            UninstallPackage(package, true);
+            // Removes the actual package. If the package has any dependents, it only gets removed from the lupo.json
+            UninstallPackage(package, HasDependents(package));
         }
 
         /// <summary>
