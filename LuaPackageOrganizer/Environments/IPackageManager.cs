@@ -18,6 +18,15 @@ namespace LuaPackageOrganizer.Environments
         public bool IsInstalled(Package package, bool explicitly = false);
 
         /// <summary>
+        /// Resolves the already installed package using the vendor and the name of the package. If the package could
+        /// not be resolved, a default Package is returned 
+        /// </summary>
+        /// <param name="vendor"></param>
+        /// <param name="package"></param>
+        /// <returns></returns>
+        public Package ResolveInstalled(string vendor, string package);
+
+        /// <summary>
         /// Returns if the given package has any dependents
         /// </summary>
         /// <param name="package"></param>

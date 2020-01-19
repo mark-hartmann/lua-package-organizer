@@ -30,6 +30,11 @@ namespace LuaPackageOrganizer.Environments
                 : _lupoLock.GetPackages().Any(p => p.FullName == package.FullName);
         }
 
+        public Package ResolveInstalled(string vendor, string package)
+        {
+            return _lupoJson.Packages.FirstOrDefault(p => p.FullName == vendor + '/' + package);
+        }
+
         public bool HasDependents(Package package)
         {
             return _lupoLock.GetDependents(package).Any();
