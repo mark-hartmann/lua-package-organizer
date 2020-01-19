@@ -93,6 +93,8 @@ namespace LuaPackageOrganizer.Environments
                 _lupoLock.UnlockPackage(package);
                 _lupoJson.RemovePackage(package);
             }
+
+            IsModified = true;
         }
 
         public void ApplyChanges()
