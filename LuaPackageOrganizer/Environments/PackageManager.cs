@@ -53,11 +53,32 @@ namespace LuaPackageOrganizer.Environments
             repository.DownloadFiles(package, InstallPath(package));
         }
 
-        public void Uninstall(Package package, bool explicitly = false)
+        public void Uninstall(Package package)
+        {
+            var removablePackages =
+                _lupoLock.GetRemovableDependencies(package).Where(dep => !IsInstalled(dep, true));
+
+            foreach (var removablePackage in removablePackages)
+            {
+                UninstallPackage(removablePackage);
+            }
+
+            UninstallPackage(package, true);
+        }
+
+        /// <summary>
+        /// The actual package remover
+        /// </summary>
+        /// <param name="package"></param>
+        /// <param name="explicitly">If true, the package is removed from the lupo.json as well</param>
+        private void UninstallPackage(Package package, bool explicitly = false)
         {
             _lupoLock.UnlockPackage(package);
-            // If the package is to be removed explicitly, the package gets removed from the lupo.json as well
-            if (explicitly) _lupoJson.RemovePackage(package);
+
+            if (explicitly)
+            {
+                _lupoJson.RemovePackage(package);
+            }
 
             Directory.Delete(InstallPath(package), true);
         }
