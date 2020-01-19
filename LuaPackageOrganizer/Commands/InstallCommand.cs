@@ -40,21 +40,31 @@ namespace LuaPackageOrganizer.Commands
 
             try
             {
-                if (_environment.LupoJson.Packages.Contains(package) == false)
+                if (_environment.PackageManager.IsInstalled(package, true) == false)
                 {
                     // todo: Check if the dependencies are broken (Same package w/ different Releases) 
                     var packages = new List<Package>(_repository.GetRequiredPackages(package)) {package};
-                    var installationRequired = packages.Where(p => !_environment.PackageAlreadyInstalled(p)).ToList();
+
+                    var installationRequired =
+                        packages.Where(p => _environment.PackageManager.IsInstalled(p) == false).ToList();
+
+                    var installationNotRequired =
+                        packages.Where(p => installationRequired.Contains(p) == false).ToList();
 
                     Console.WriteLine($"{packages.Count} packages will now be installed");
 
-                    foreach (var satisfied in packages.Where(p => _environment.PackageAlreadyInstalled(p)).ToList())
+                    foreach (var satisfied in installationNotRequired)
+                    {
                         Console.WriteLine($"{satisfied.FullName} @ {satisfied.Release} is already satisfied");
+                    }
 
+                    // If pkg is the same as the package the user wants to install, it gets installed explicitly and
+                    // gets added to the lupo.json
                     foreach (var pkg in installationRequired)
-                        _environment.InstallPackage(pkg, _repository);
-
-                    _environment.LupoJson.AddPackage(package);
+                    {
+                        var installExplicitly = pkg.Equals(package);
+                        _environment.PackageManager.Install(pkg, _repository, installExplicitly);
+                    }
                 }
                 else
                 {
@@ -106,17 +116,11 @@ namespace LuaPackageOrganizer.Commands
                 Console.WriteLine(e.Message);
             }
 
-            // If the environment was modified, the content of the lupo.json file gets overwritten with the newly
-            // installed package
-            if (_environment.LupoJson.IsModified)
-            {
-                _environment.LupoJson.WriteChanges();
-                _environment.LupoLock.WriteChanges();
-            }
+            _environment.PackageManager.ApplyChanges();
 
             // If the environment was modified (added folders) but failed during the installation process, the mess must
             // be cleaned and set back to the initial state
-            if (_environment.LupoJson.IsModified)
+            if (_environment.PackageManager.IsModified)
             {
                 // todo: Cleanup all the mess that was added during the process
                 // todo: Iterate through all added packages and cleanup all created directories or so 
