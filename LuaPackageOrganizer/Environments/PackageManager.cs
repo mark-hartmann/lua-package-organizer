@@ -114,6 +114,6 @@ namespace LuaPackageOrganizer.Environments
         }
 
         public string InstallPath(Package package) =>
-            Path.Join(_env.VendorDirectoryPath, package.Vendor, package.FullName);
+            Path.Join(_env.VendorDirectoryPath, package.Vendor, package.PackageName);
     }
 }
