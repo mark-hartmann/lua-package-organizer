@@ -17,7 +17,7 @@ namespace LuaPackageOrganizer.Environments
 
             _env = environment;
             _lupoJson = LupoJsonFile.ParseFile(environment.LupoJsonFile);
-            _lupoLock = LupoLockFile.ParseFile(environment.LupoJsonFile);
+            _lupoLock = LupoLockFile.ParseFile(environment.LupoLockFile);
         }
 
         public bool IsModified { get; private set; }
