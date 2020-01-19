@@ -67,20 +67,24 @@ namespace LuaPackageOrganizer.Environments
         }
 
         /// <summary>
-        /// The actual package remover
+        /// The actual package remover. Removes a package completely (files & lupo.lock) if passive equals false,
+        /// otherwise the package is only removed from lupo.json
         /// </summary>
         /// <param name="package"></param>
-        /// <param name="explicitly">If true, the package is removed from the lupo.json as well</param>
-        private void UninstallPackage(Package package, bool explicitly = false)
+        /// <param name="passive">If true, the package is removed from the lupo.json only</param>
+        private void UninstallPackage(Package package, bool passive = false)
         {
-            _lupoLock.UnlockPackage(package);
-
-            if (explicitly)
+            if (passive)
             {
                 _lupoJson.RemovePackage(package);
             }
-
-            Directory.Delete(InstallPath(package), true);
+            else
+            {
+                // Removes every file withing the packages installation directory
+                Directory.Delete(InstallPath(package), true);
+                _lupoLock.UnlockPackage(package);
+                _lupoJson.RemovePackage(package);
+            }
         }
 
         public void ApplyChanges()
