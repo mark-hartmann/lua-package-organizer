@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using LuaPackageOrganizer.Packages;
 
 namespace LuaPackageOrganizer.Environments
 {
@@ -29,6 +28,30 @@ namespace LuaPackageOrganizer.Environments
         {
             if (!File.Exists(LupoJsonFile) || !File.Exists(LupoLockFile))
                 throw new Exception("Project directory has not yet been initialized or is corrupted");
+        }
+
+        public static void Init(string path)
+        {
+            var lupoJsonFile = Path.Join(path, "lupo.json");
+            var lupoLockFile = Path.Join(path, "lupo.lock");
+            var vendorDirectory = Path.Join(path, "vendor");
+
+            if (File.Exists(Path.Join(path, "lupo.json")))
+            {
+                throw new Exception("Project already initialized");
+            }
+
+            Console.WriteLine("Creating lupo.json");
+            File.Create(lupoJsonFile);
+
+            Console.WriteLine("Creating lupo.lock");
+            File.Create(lupoLockFile);
+
+            Console.WriteLine("Creating vendor directory");
+            Directory.CreateDirectory(vendorDirectory);
+
+            Console.WriteLine();
+            Console.WriteLine("Done");
         }
     }
 }
