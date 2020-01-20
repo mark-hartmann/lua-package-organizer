@@ -9,7 +9,8 @@ namespace LuaPackageOrganizer
     {
         static void Main(string[] args)
         {
-            Parser.Default.ParseArguments<InstallOptions, RemoveOptions>(args)
+            Parser.Default.ParseArguments<InitOptions, InstallOptions, RemoveOptions>(args)
+                .WithParsed<InitOptions>(opts => new InitCommand().Execute(opts))
                 .WithParsed<InstallOptions>(opts => new InstallCommand().Execute(opts))
                 .WithParsed<RemoveOptions>(opts => new RemoveCommand().Execute(opts))
                 .WithNotParsed(Console.WriteLine);
