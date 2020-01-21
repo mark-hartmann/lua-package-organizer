@@ -27,7 +27,8 @@ namespace LuaPackageOrganizer.Environments
         private void VerifyProjectDirectory()
         {
             if (!File.Exists(LupoJsonFile) || !File.Exists(LupoLockFile))
-                throw new Exception("Project directory has not yet been initialized or is corrupted, maybe you forgot to run \"lupo init\"?");
+                throw new Exception(
+                    "Project directory has not yet been initialized or is corrupted, maybe you forgot to run \"lupo init\"?");
         }
 
         public static void Init(string path)
@@ -36,7 +37,7 @@ namespace LuaPackageOrganizer.Environments
             var lupoLockFile = Path.Join(path, "lupo.lock");
             var vendorDirectory = Path.Join(path, "vendor");
 
-            if (File.Exists(Path.Join(path, "lupo.json")))
+            if (File.Exists(lupoJsonFile))
             {
                 throw new Exception("Project already initialized");
             }
