@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Drawing;
+using System.Linq;
+using Colorful;
 using Console = Colorful.Console;
 
 namespace LuaPackageOrganizer
@@ -37,19 +39,50 @@ namespace LuaPackageOrganizer
 
     internal static class Terminal
     {
-        public static void WriteError(string message) => WriteLine("ERROR", message, Color.Firebrick);
-        public static void WriteDebug(string message) => WriteLine("DEBUG", message, Color.Olive);
-        public static void WriteNotice(string message) => WriteLine("INFO", message, Color.Gray);
-        public static void WriteSuccess(string message) => WriteLine("SUCCESS", message, Color.Green);
-
-        private static void WriteLine(string type, string message, Color messageColor)
+        public enum MessageType
         {
-            // Makes the messages appearing nicely
-            var messageType = $"[{type}]".PadLeft(9, ' ');
+            Error,
+            Debug,
+            Notice,
+            Success,
+        }
+
+        public static void WriteError(string message) => WriteLine(MessageType.Error, message, Color.Firebrick);
+
+        public static void WriteDebug(string message) => WriteLine(MessageType.Debug, message, Color.Gray);
+
+        public static void WriteNotice(string message) => WriteLine(MessageType.Notice, message, Color.DodgerBlue);
+
+        public static void WriteSuccess(string message) => WriteLine(MessageType.Success, message, Color.LightGreen);
+
+        public static void WriteLine(MessageType type, string message, Color textColor)
+        {
+            WriteLine(type, message, new StyleSheet(textColor));
+        }
+
+        public static void WriteLine(MessageType type, string message, StyleSheet styleSheet)
+        {
+            Write(type, message + Environment.NewLine, styleSheet);
+        }
+
+        public static void Write(MessageType type, string message, Color textColor)
+        {
+            Write(type, message, new StyleSheet(textColor));
+        }
+
+        public static void Write(MessageType type, string message, StyleSheet stylesheet)
+        {
+            // Resolves the longest name so it can be used to set the totalWidth
+            var totalWidth = Enum.GetNames(typeof(MessageType)).Max(s => s.Length);
+            var messageTypeName = Enum.GetName(typeof(MessageType), type);
             
-            Console.Write($"{DateTime.Now} ", Color.Gray);   
-            Console.Write($"{messageType} ", Color.Olive);   
-            Console.WriteLine($"{message}", messageColor);   
+            // totalWidth + 2 because of the braces around the message type
+            var messageType = $"[{messageTypeName}]".PadLeft(totalWidth + 2, ' ');
+
+            Console.Write($"{DateTime.Now} ", Color.LightGray);
+            Console.Write($"{messageType} ", Color.Olive);
+
+            Console.WriteStyled($"{message}", stylesheet);
         }
     }
 }
