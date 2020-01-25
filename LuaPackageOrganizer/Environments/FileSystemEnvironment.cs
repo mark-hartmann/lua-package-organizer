@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Drawing;
 using System.IO;
+using Colorful;
 
 namespace LuaPackageOrganizer.Environments
 {
@@ -39,20 +41,24 @@ namespace LuaPackageOrganizer.Environments
 
             if (File.Exists(lupoJsonFile))
             {
-                throw new Exception("Project already initialized");
+                Terminal.WriteNotice("Project already initialized");
+                return;
             }
 
-            Console.WriteLine("Creating lupo.json");
+            // Highlighting the file/directory looks cool, especially in coral!
+            var stylesheet = new StyleSheet(Color.LightGray);
+            stylesheet.AddStyle("./[a-zA-Z.]+", Color.Coral);
+
+            Terminal.WriteLine(Terminal.MessageType.Notice, "Create ./lupo.json file", stylesheet);
             File.Create(lupoJsonFile);
 
-            Console.WriteLine("Creating lupo.lock");
+            Terminal.WriteLine(Terminal.MessageType.Notice, "Create ./lupo.lock file", stylesheet);
             File.Create(lupoLockFile);
 
-            Console.WriteLine("Creating vendor directory");
+            Terminal.WriteLine(Terminal.MessageType.Notice, "Create ./vendor directory", stylesheet);
             Directory.CreateDirectory(vendorDirectory);
 
-            Console.WriteLine();
-            Console.WriteLine("Done");
+            Terminal.WriteSuccess("Finished");
         }
     }
 }

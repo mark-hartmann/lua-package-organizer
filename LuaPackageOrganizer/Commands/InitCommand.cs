@@ -16,15 +16,12 @@ namespace LuaPackageOrganizer.Commands
                     throw new DirectoryNotFoundException($"Directory \"{options.ProjectDirectory}\" does not exist.");
                 }
 
-                Console.WriteLine("Initialize project...");
                 FileSystemEnvironment.Init(options.ProjectDirectory);
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
-
-                Console.WriteLine();
-                Console.WriteLine("Initialisation failed");
+                Terminal.WriteNotice(e.Message);
+                Terminal.WriteError("Initialisation failed");
             }
         }
     }
