@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using Console = Colorful.Console;
 
 namespace LuaPackageOrganizer
@@ -34,7 +35,21 @@ namespace LuaPackageOrganizer
         }
     }
 
-    class Terminal
+    internal static class Terminal
     {
+        public static void WriteError(string message) => WriteLine("ERROR", message, Color.Firebrick);
+        public static void WriteDebug(string message) => WriteLine("DEBUG", message, Color.Olive);
+        public static void WriteNotice(string message) => WriteLine("INFO", message, Color.Gray);
+        public static void WriteSuccess(string message) => WriteLine("SUCCESS", message, Color.Green);
+
+        private static void WriteLine(string type, string message, Color messageColor)
+        {
+            // Makes the messages appearing nicely
+            var messageType = $"[{type}]".PadLeft(9, ' ');
+            
+            Console.Write($"{DateTime.Now} ", Color.Gray);   
+            Console.Write($"{messageType} ", Color.Olive);   
+            Console.WriteLine($"{message}", messageColor);   
+        }
     }
 }
