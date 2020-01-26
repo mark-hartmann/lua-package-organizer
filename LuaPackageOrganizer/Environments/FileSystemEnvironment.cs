@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.IO;
-using Colorful;
+using Pastel;
 
 namespace LuaPackageOrganizer.Environments
 {
@@ -45,17 +45,13 @@ namespace LuaPackageOrganizer.Environments
                 return;
             }
 
-            // Highlighting the file/directory looks cool, especially in coral!
-            var stylesheet = new StyleSheet(Color.LightGray);
-            stylesheet.AddStyle("./[a-zA-Z.]+", Color.Coral);
-
-            Terminal.WriteLine(Terminal.MessageType.Notice, "Create ./lupo.json file", stylesheet);
+            Terminal.WriteNotice("Create " + "/lupo.json".Pastel(Color.Coral) + " file");
             File.Create(lupoJsonFile);
 
-            Terminal.WriteLine(Terminal.MessageType.Notice, "Create ./lupo.lock file", stylesheet);
+            Terminal.WriteNotice("Create " + "/lupo.lock".Pastel(Color.Coral) + " file");
             File.Create(lupoLockFile);
 
-            Terminal.WriteLine(Terminal.MessageType.Notice, "Create ./vendor directory", stylesheet);
+            Terminal.WriteNotice("Create " + "/vendor".Pastel(Color.Coral) + " directory");
             Directory.CreateDirectory(vendorDirectory);
 
             Terminal.WriteSuccess("Finished");
