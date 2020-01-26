@@ -51,7 +51,7 @@ namespace LuaPackageOrganizer
 
         public static void WriteDebug(string message) => WriteLine(MessageType.Debug, message, Color.Gray);
 
-        public static void WriteNotice(string message) => WriteLine(MessageType.Notice, message, Color.DodgerBlue);
+        public static void WriteNotice(string message) => WriteLine(MessageType.Notice, message, Color.LightGray);
 
         public static void WriteSuccess(string message) => WriteLine(MessageType.Success, message, Color.LightGreen);
 
