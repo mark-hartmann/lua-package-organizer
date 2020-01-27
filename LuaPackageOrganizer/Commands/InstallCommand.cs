@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using LuaPackageOrganizer.Commands.Options;
 using LuaPackageOrganizer.Environments;
 using LuaPackageOrganizer.Packages;
 using LuaPackageOrganizer.Packages.Repositories;
+using Pastel;
 
 namespace LuaPackageOrganizer.Commands
 {
@@ -32,10 +34,13 @@ namespace LuaPackageOrganizer.Commands
                 var latestRelease = _repository.GetLatestRelease(package, options.UseActiveBranch);
                 package = new Package(package.Vendor, package.PackageName, latestRelease);
 
-                Console.WriteLine(
+                var colorizedPackageName = package.FullName.Pastel(Color.CornflowerBlue);
+                var colorizedReleaseName = package.Release.Name.Pastel(Color.CornflowerBlue);
+
+                Terminal.WriteNotice(
                     options.UseActiveBranch
-                        ? $"Warning: {package.FullName} will use {package.Release}, this may not be a good idea!"
-                        : $"Using latest release ({package.Release}) for {package.FullName}");
+                        ? $"Warning: {colorizedPackageName} will use {colorizedReleaseName}, this may not be a good idea!"
+                        : $"Using latest release ({colorizedReleaseName}) for {colorizedPackageName}");
             }
 
             try
@@ -51,13 +56,14 @@ namespace LuaPackageOrganizer.Commands
                     var installationNotRequired =
                         packages.Where(p => installationRequired.Contains(p) == false).ToList();
 
-                    Console.WriteLine($"{packages.Count} packages will now be installed");
-
+                    Terminal.WriteNotice($"{packages.Count} packages will now be installed");
                     foreach (var satisfied in installationNotRequired)
                     {
-                        Console.WriteLine($"{satisfied.FullName} @ {satisfied.Release} is already satisfied");
+                        Terminal.WriteNotice($"{satisfied.FullName.Pastel(Color.CornflowerBlue)} is already satisfied");
                     }
 
+                    Console.WriteLine();
+                    
                     // If pkg is the same as the package the user wants to install, it gets installed explicitly and
                     // gets added to the lupo.json
                     foreach (var pkg in installationRequired)
@@ -68,13 +74,13 @@ namespace LuaPackageOrganizer.Commands
                 }
                 else
                 {
-                    Console.WriteLine($"{package} is already installed");
+                    Terminal.WriteNotice($"{package.FullName.Pastel(Color.CornflowerBlue)} is already installed");
                 }
             }
             catch (ReleaseNotFoundException e)
             {
                 var availableReleases = _repository.GetAvailableReleases(e.FailedPackage);
-                Console.WriteLine(e.Message + ", " + (availableReleases.Count == 0
+                Terminal.WriteNotice(e.Message + ", " + (availableReleases.Count == 0
                                       ? "no releases available."
                                       : "the following releases are available:"));
 

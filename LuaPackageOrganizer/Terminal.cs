@@ -27,7 +27,7 @@ namespace LuaPackageOrganizer
             var percentage = progress.ToString().PadLeft(3, ' ');
             var progressBar = new string('=', progress / 10).PadRight(10, '-');
 
-            Console.Write($"[{progressBar}] {percentage}% {message}");
+            Console.Write($"[{progressBar}] {percentage}% ".Pastel(Color.Coral) + message);
         }
 
         public void Dispose()

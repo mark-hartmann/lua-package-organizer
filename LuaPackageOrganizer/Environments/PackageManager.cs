@@ -51,13 +51,19 @@ namespace LuaPackageOrganizer.Environments
 
             if (explicitly)
             {
+                Terminal.WriteNotice($"Installing {package.FullName.Pastel(Color.CornflowerBlue)}");
                 _lupoJson.AddPackage(package);
+            }
+            else
+            {
+                Terminal.WriteNotice($"Installing {package.FullName.Pastel(Color.CornflowerBlue)} as dependency");
             }
 
             IsModified = true;
             _lupoLock.LockPackage(package, repository);
 
             repository.DownloadFiles(package, InstallPath(package));
+            Console.WriteLine();
         }
 
         public void Uninstall(Package package)
