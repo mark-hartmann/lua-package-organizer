@@ -70,7 +70,7 @@ namespace LuaPackageOrganizer
             var messageTypeName = Enum.GetName(typeof(MessageType), type);
 
             // totalWidth + 2 because of the braces around the message type
-            var messageType = $"[{messageTypeName}]".PadLeft(totalWidth + 2, ' ');
+            var messageType = $"{messageTypeName?.ToLower()}".PadLeft(totalWidth, ' ');
             
             Console.Write($"{DateTime.Now} ".Pastel(Color.LightGray));
             Console.Write($"{messageType} ".Pastel(Color.Olive));
