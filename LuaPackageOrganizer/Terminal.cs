@@ -55,26 +55,26 @@ namespace LuaPackageOrganizer
 
         public static void WriteSuccess(string message) => WriteLine(MessageType.Success, message, Color.LightGreen);
 
-        public static void WriteLine(MessageType type, string message, Color textColor)
+        public static void WriteLine(MessageType? type, string message, Color textColor)
         {
             WriteLine(type, message, new StyleSheet(textColor));
         }
 
-        public static void WriteLine(MessageType type, string message, StyleSheet styleSheet)
+        public static void WriteLine(MessageType? type, string message, StyleSheet styleSheet)
         {
             Write(type, message + Environment.NewLine, styleSheet);
         }
 
-        public static void Write(MessageType type, string message, Color textColor)
+        public static void Write(MessageType? type, string message, Color textColor)
         {
             Write(type, message, new StyleSheet(textColor));
         }
 
-        public static void Write(MessageType type, string message, StyleSheet stylesheet)
+        public static void Write(MessageType? type, string message, StyleSheet stylesheet)
         {
             // Resolves the longest name so it can be used to set the totalWidth
             var totalWidth = Enum.GetNames(typeof(MessageType)).Max(s => s.Length);
-            var messageTypeName = Enum.GetName(typeof(MessageType), type);
+            var messageTypeName = type != null ? Enum.GetName(typeof(MessageType), type) : "";
             
             // totalWidth + 2 because of the braces around the message type
             var messageType = $"[{messageTypeName}]".PadLeft(totalWidth + 2, ' ');
