@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Drawing;
 using LuaPackageOrganizer.Commands.Options;
 using LuaPackageOrganizer.Environments;
+using Pastel;
 
 namespace LuaPackageOrganizer.Commands
 {
@@ -18,20 +20,18 @@ namespace LuaPackageOrganizer.Commands
 
                 if (package.PackageName == null)
                 {
-                    throw new Exception($"{options.Package} is not installed and therefore not removable");
+                    throw new Exception(
+                        $"{options.Package.Pastel(Color.CornflowerBlue)} is not installed and therefore not removable");
                 }
-                
-                Console.Write($"Removing package {package.FullName}: ");
 
                 environment.PackageManager.Uninstall(package);
                 environment.PackageManager.ApplyChanges();
 
-                Console.WriteLine("Done");
+                Terminal.WriteSuccess("Done");
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
-                Console.WriteLine(e);
+                Terminal.WriteError(e.Message);
             }
         }
     }

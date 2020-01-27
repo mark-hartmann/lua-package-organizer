@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Pastel;
 
 namespace LuaPackageOrganizer.Packages.Repositories
 {
@@ -153,7 +155,8 @@ namespace LuaPackageOrganizer.Packages.Repositories
             using (var progressbar = new ProgressBar())
             {
                 while (client.IsBusy)
-                    progressbar.Refresh(progress, $"Downloading {package.FullName} @ {package.Release}");
+                    progressbar.Refresh(progress,
+                        $"Downloading {package.FullName.Pastel(Color.CornflowerBlue)} @ {package.Release.Name.Pastel(Color.CornflowerBlue)}");
             }
 
             Console.WriteLine();
@@ -172,7 +175,7 @@ namespace LuaPackageOrganizer.Packages.Repositories
         {
             if (!useDefaultBranch && GetAvailableReleases(package).Count == 0)
                 throw new Exception(
-                    $"{package.FullName} has no releases, you may want to use --no-release");
+                    $"{package.FullName.Pastel(Color.CornflowerBlue)} has no releases, you may want to use --no-release");
 
             if (!useDefaultBranch && GetAvailableReleases(package).Count != 0)
                 return GetAvailableReleases(package).First();
