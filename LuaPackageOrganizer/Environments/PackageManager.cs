@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using LuaPackageOrganizer.Packages;
+using Pastel;
 
 namespace LuaPackageOrganizer.Environments
 {
@@ -63,8 +65,10 @@ namespace LuaPackageOrganizer.Environments
             // Recursively resolves all removable packages related to the package. Packets which were installed
             // explicitly are ignored
             var removablePackages = _lupoLock.GetRemovableDependencies(package)
-                .Where(dep => !IsInstalled(dep, true));
+                .Where(dep => !IsInstalled(dep, true)).ToList();
 
+            Terminal.WriteNotice(
+                $"Searched for no longer required dependencies, found {removablePackages.Count.ToString()}");
             foreach (var removablePackage in removablePackages)
             {
                 UninstallPackage(removablePackage);
@@ -82,14 +86,21 @@ namespace LuaPackageOrganizer.Environments
         /// <param name="passive">If true, the package is removed from the lupo.json only</param>
         private void UninstallPackage(Package package, bool passive = false)
         {
+            var packageName = package.FullName.Pastel(Color.CornflowerBlue);
+
             if (passive)
             {
+                Terminal.WriteNotice($"{packageName} is required by another package and will not be removed entirely!");
+                Terminal.WriteNotice($"Removing {packageName} from lupo.json, leaving the rest as is...");
                 _lupoJson.RemovePackage(package);
             }
             else
             {
                 // Removes every file withing the packages installation directory
                 Directory.Delete(InstallPath(package), true);
+
+                Terminal.WriteDebug($"Removing {packageName}");
+
                 _lupoLock.UnlockPackage(package);
                 _lupoJson.RemovePackage(package);
             }
@@ -104,6 +115,7 @@ namespace LuaPackageOrganizer.Environments
                 return;
             }
 
+            Terminal.WriteDebug("Writing changes...");
             _lupoJson.WriteChanges();
             _lupoLock.WriteChanges();
         }
