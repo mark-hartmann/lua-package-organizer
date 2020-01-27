@@ -89,7 +89,7 @@ namespace LuaPackageOrganizer.Commands
                     Console.Write('[');
                     for (var i = 0; i < availableReleases.Count; i++)
                     {
-                        Console.Write(availableReleases[i].Name);
+                        Console.Write(availableReleases[i].Name.Pastel(Color.CornflowerBlue));
                         if (i < availableReleases.Count - 1)
                         {
                             Console.Write(", ");
@@ -104,7 +104,7 @@ namespace LuaPackageOrganizer.Commands
                     var lectures = $@"
 [Comment on missing releases]
 ------------------------------------------------------------------------------------------------------------------------
-1. A note to {package.Vendor}: (._.) <- this is how you should feel!
+1. A note to {package.Vendor.Pastel(Color.CornflowerBlue)}: (._.) <- this is how you should feel!
 
 2. This is unfortunately a common phenomenon in the 'amateurish' Lua/Love2D community. 
    It is awesome when people invest their free time to develop open source projects, but especially for larger projects 
@@ -112,14 +112,14 @@ namespace LuaPackageOrganizer.Commands
 
    Perhaps today would be a good day to ask for a favor. 
    You can create an issue and ask the content creator to provide a release by following this link:
-   {issuesUri}
+   {issuesUri.Pastel(Color.CornflowerBlue)}
 ------------------------------------------------------------------------------------------------------------------------";
                     Console.WriteLine(lectures);
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                Terminal.WriteError(e.Message);
             }
 
             _environment.PackageManager.ApplyChanges();
