@@ -53,6 +53,11 @@ namespace LuaPackageOrganizer.Commands
                     Terminal.WriteNotice($"{package.FullName.Pastel(Color.CornflowerBlue)} is already installed");
                     return;
                 }
+                
+                if (!_repository.IsReleaseAvailable(package, package.Release))
+                {
+                    throw new ReleaseNotFoundException(package);
+                }
 
                 // todo: Check if the dependencies are broken (Same package w/ different Releases) 
                 var packages = new List<Package>(_repository.GetRequiredPackages(package)) {package};

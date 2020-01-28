@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Drawing;
+using Pastel;
 
 namespace LuaPackageOrganizer.Packages
 {
@@ -13,7 +15,8 @@ namespace LuaPackageOrganizer.Packages
 
         private static string GenerateErrorMessage(Package package)
         {
-            return $"No such release ({package.Release}) for {package.Vendor}{package.PackageName}";
+            return
+                $"No such release ({package.Release.Name.Pastel(Color.CornflowerBlue)}) for {package.FullName.Pastel(Color.CornflowerBlue)}";
         }
     }
 }
