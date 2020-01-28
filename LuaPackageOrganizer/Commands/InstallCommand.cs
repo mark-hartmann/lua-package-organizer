@@ -53,7 +53,7 @@ namespace LuaPackageOrganizer.Commands
                     Terminal.WriteNotice($"{package.FullName.Pastel(Color.CornflowerBlue)} is already installed");
                     return;
                 }
-                
+
                 if (!_repository.IsReleaseAvailable(package, package.Release))
                 {
                     throw new ReleaseNotFoundException(package);
@@ -93,17 +93,10 @@ namespace LuaPackageOrganizer.Commands
 
                 if (availableReleases.Count > 0)
                 {
-                    Console.Write('[');
-                    for (var i = 0; i < availableReleases.Count; i++)
-                    {
-                        Console.Write(availableReleases[i].Name.Pastel(Color.CornflowerBlue));
-                        if (i < availableReleases.Count - 1)
-                        {
-                            Console.Write(", ");
-                        }
-                    }
-
-                    Console.Write(']');
+                    var releases = string.Join(", ",
+                        availableReleases.Select(p => p.Name.Pastel(Color.CornflowerBlue)));
+                    
+                    Console.Write($"[{releases}]");
                 }
                 else
                 {
