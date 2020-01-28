@@ -24,13 +24,15 @@ namespace LuaPackageOrganizer.Commands
         {
             _environment = new FileSystemEnvironment(options.ProjectDirectory);
 
+            // Create package using the given options
             var package = new Package(options.Vendor, options.PackageName, new Release {Name = options.Release});
 
+            // If the user does not provide a release to install, it must be resolved
             if (package.Release.Name == null)
             {
                 // This is a neat one, if the user tried to install a package without release it checks if the
                 // --no-release flag was set. If so, the package will use the projects active branch, otherwise
-                // the latest available release will be installed 
+                // the latest available release will be installed
                 var latestRelease = _repository.GetLatestRelease(package, options.UseActiveBranch);
                 package = new Package(package.Vendor, package.PackageName, latestRelease);
 
@@ -45,44 +47,44 @@ namespace LuaPackageOrganizer.Commands
 
             try
             {
-                if (_environment.PackageManager.IsInstalled(package, true) == false)
-                {
-                    // todo: Check if the dependencies are broken (Same package w/ different Releases) 
-                    var packages = new List<Package>(_repository.GetRequiredPackages(package)) {package};
-
-                    var installationRequired =
-                        packages.Where(p => _environment.PackageManager.IsInstalled(p) == false).ToList();
-
-                    var installationNotRequired =
-                        packages.Where(p => installationRequired.Contains(p) == false).ToList();
-
-                    Terminal.WriteNotice($"{packages.Count} packages will now be installed");
-                    foreach (var satisfied in installationNotRequired)
-                    {
-                        Terminal.WriteNotice($"{satisfied.FullName.Pastel(Color.CornflowerBlue)} is already satisfied");
-                    }
-
-                    Console.WriteLine();
-                    
-                    // If pkg is the same as the package the user wants to install, it gets installed explicitly and
-                    // gets added to the lupo.json
-                    foreach (var pkg in installationRequired)
-                    {
-                        var installExplicitly = pkg.Equals(package);
-                        _environment.PackageManager.Install(pkg, _repository, installExplicitly);
-                    }
-                }
-                else
+                // Early exit installation if the package is already installed
+                if (_environment.PackageManager.IsInstalled(package, true))
                 {
                     Terminal.WriteNotice($"{package.FullName.Pastel(Color.CornflowerBlue)} is already installed");
+                    return;
+                }
+
+                // todo: Check if the dependencies are broken (Same package w/ different Releases) 
+                var packages = new List<Package>(_repository.GetRequiredPackages(package)) {package};
+
+                var installationRequired =
+                    packages.Where(p => _environment.PackageManager.IsInstalled(p) == false).ToList();
+
+                var installationNotRequired =
+                    packages.Where(p => installationRequired.Contains(p) == false).ToList();
+
+                Terminal.WriteNotice($"{packages.Count} packages will now be installed");
+                foreach (var satisfied in installationNotRequired)
+                {
+                    Terminal.WriteNotice($"{satisfied.FullName.Pastel(Color.CornflowerBlue)} is already satisfied");
+                }
+
+                Console.WriteLine();
+
+                // If pkg is the same as the package the user wants to install, it gets installed explicitly and
+                // gets added to the lupo.json
+                foreach (var pkg in installationRequired)
+                {
+                    var installExplicitly = pkg.Equals(package);
+                    _environment.PackageManager.Install(pkg, _repository, installExplicitly);
                 }
             }
             catch (ReleaseNotFoundException e)
             {
                 var availableReleases = _repository.GetAvailableReleases(e.FailedPackage);
                 Terminal.WriteNotice(e.Message + ", " + (availableReleases.Count == 0
-                                      ? "no releases available."
-                                      : "the following releases are available:"));
+                                         ? "no releases available."
+                                         : "the following releases are available:"));
 
                 if (availableReleases.Count > 0)
                 {
