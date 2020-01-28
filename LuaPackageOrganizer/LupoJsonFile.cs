@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using LuaPackageOrganizer.Packages;
 using Newtonsoft.Json.Linq;
+using Pastel;
 
 namespace LuaPackageOrganizer
 {
@@ -72,11 +74,18 @@ namespace LuaPackageOrganizer
             if (File.Exists(path) != true)
                 throw new Exception("lupo.json not found");
 
+            var lupoJsonContent = File.ReadAllText(path);
+
+            if (lupoJsonContent == "")
+            {
+                throw new Exception("lupo.json".Pastel(Color.Coral) + " file is either empty or invalid json");
+            }
+
             // todo: Validate lupo.json schema before creating the instance!
             var instance = new LupoJsonFile(path)
             {
-                _state = JObject.Parse(File.ReadAllText(path)),
-                _initialState = JObject.Parse(File.ReadAllText(path))
+                _state = JObject.Parse(lupoJsonContent),
+                _initialState = JObject.Parse(lupoJsonContent)
             };
 
             foreach (var jToken in instance._initialState["packages"].ToList())
