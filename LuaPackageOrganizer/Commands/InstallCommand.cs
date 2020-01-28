@@ -109,18 +109,14 @@ namespace LuaPackageOrganizer.Commands
                 {
                     var issuesUri = $"https://github.com/{options.Package}/issues";
                     var lectures = $@"
-[Comment on missing releases]
-------------------------------------------------------------------------------------------------------------------------
-1. A note to {package.Vendor.Pastel(Color.CornflowerBlue)}: (._.) <- this is how you should feel!
-
-2. This is unfortunately a common phenomenon in the 'amateurish' Lua/Love2D community. 
-   It is awesome when people invest their free time to develop open source projects, but especially for larger projects 
-   or libraries it's an advantage if some kind of versioning is used, this helps both the developers and the users.
-
-   Perhaps today would be a good day to ask for a favor. 
-   You can create an issue and ask the content creator to provide a release by following this link:
-   {issuesUri.Pastel(Color.CornflowerBlue)}
-------------------------------------------------------------------------------------------------------------------------";
+~ A note to {package.Vendor.Pastel(Color.CornflowerBlue)}: (._.) <- this is how some of us feel!
+~
+~ It is awesome when people invest their free time to develop open source projects, but especially for larger projects 
+~ or libraries it's an advantage if some kind of versioning is used, this helps both the developers and the users.
+~ 
+~ You can create an issue and ask the content creator to provide a release by following this link:
+~ {issuesUri.Pastel(Color.CornflowerBlue)}
+";
                     Console.WriteLine(lectures);
                 }
             }
