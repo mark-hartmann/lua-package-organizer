@@ -45,13 +45,17 @@ namespace LuaPackageOrganizer.Environments
                 return;
             }
 
-            Terminal.WriteNotice("Create " + "/lupo.json".Pastel(Color.Coral) + " file");
-            File.Create(lupoJsonFile);
+            var lupoFileContent = @"{
+  ""packages"": {}
+}";
+            
+            Terminal.WriteNotice("Writing " + "/lupo.json".Pastel(Color.Coral) + " file");
+            File.WriteAllText(lupoJsonFile, lupoFileContent);
 
-            Terminal.WriteNotice("Create " + "/lupo.lock".Pastel(Color.Coral) + " file");
-            File.Create(lupoLockFile);
+            Terminal.WriteNotice("Writing " + "/lupo.lock".Pastel(Color.Coral) + " file");
+            File.WriteAllText(lupoLockFile, lupoFileContent);
 
-            Terminal.WriteNotice("Create " + "/vendor".Pastel(Color.Coral) + " directory");
+            Terminal.WriteNotice("Writing " + "/vendor".Pastel(Color.Coral) + " directory");
             Directory.CreateDirectory(vendorDirectory);
 
             Terminal.WriteSuccess("Finished");
