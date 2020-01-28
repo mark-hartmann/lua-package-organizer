@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -26,10 +27,26 @@ namespace LuaPackageOrganizer.Environments
 
         public bool IsInstalled(Package package, bool explicitly = false)
         {
-            // Should check if already installed but using a different release
-            return explicitly
-                ? _lupoJson.Packages.Contains(package)
-                : _lupoLock.GetPackages().Any(p => p.FullName == package.FullName);
+            // Only searches in the lupo.json file, if the package is already installed using a different release, an
+            // exception is thrown
+            static bool ContainedIn(Package searchedPackage, IEnumerable<Package> packages)
+            {
+                var resolvedPackage = packages.FirstOrDefault(p => p.FullName == searchedPackage.FullName);
+
+                if (resolvedPackage.PackageName == null)
+                    return false;
+
+                if (resolvedPackage.Release.Equals(searchedPackage.Release))
+                    return true;
+
+                var colorizedPackageName = searchedPackage.FullName.Pastel(Color.CornflowerBlue);
+                var colorizedReleaseName = resolvedPackage.Release.Name.Pastel(Color.CornflowerBlue);
+
+                throw new Exception(
+                    $"{colorizedPackageName} already installed, but using release {colorizedReleaseName}");
+            }
+
+            return ContainedIn(package, explicitly ? _lupoJson.Packages : _lupoLock.GetPackages());
         }
 
         public Package ResolveInstalled(string vendor, string package)
