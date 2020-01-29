@@ -51,17 +51,17 @@ namespace LuaPackageOrganizer.Commands
 
             try
             {
+                // Should only throw if the user does not use --no-release
+                if (!repository.IsReleaseAvailable(package, package.Release) && !options.UseActiveBranch)
+                {
+                    throw new ReleaseNotFoundException(package);
+                }
+                
                 // Early exit installation if the package is already installed
                 if (environment.PackageManager.IsInstalled(package, true))
                 {
                     Terminal.WriteNotice($"{package.FullName.Pastel(Color.CornflowerBlue)} is already installed");
                     return;
-                }
-
-                // Should only throw if the user does not use --no-release
-                if (!repository.IsReleaseAvailable(package, package.Release) && !options.UseActiveBranch)
-                {
-                    throw new ReleaseNotFoundException(package);
                 }
 
                 var packages = new List<Package>(repository.GetRequiredPackages(package)) {package};
