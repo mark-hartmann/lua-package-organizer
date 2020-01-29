@@ -79,21 +79,23 @@ namespace LuaPackageOrganizer.Commands
             catch (ReleaseNotFoundException e)
             {
                 var availableReleases = repository.GetAvailableReleases(e.FailedPackage);
-                Terminal.WriteNotice(e.Message + ", " + (availableReleases.Count == 0
-                                         ? "no releases available."
-                                         : "the following releases are available:"));
-
+                
                 if (availableReleases.Count > 0)
                 {
+                    Terminal.WriteNotice($"{e.Message}, the following releases are available:");
+                    
                     var releases = string.Join(", ",
                         availableReleases.Select(p => p.Name.Pastel(Color.CornflowerBlue)));
-                    
+
                     Console.Write($"[{releases}]");
                 }
                 else
                 {
+                    Terminal.WriteError($"{e.Message}, no releases available");
+                    
                     var issuesUri = $"https://github.com/{options.Package}/issues";
-                    var lectures = $@"
+
+                    Console.WriteLine($@"
 ~ A note to {package.Vendor.Pastel(Color.CornflowerBlue)}: (._.) <- this is how some of us feel!
 ~
 ~ It is awesome when people invest their free time to develop open source projects, but especially for larger projects 
@@ -101,8 +103,7 @@ namespace LuaPackageOrganizer.Commands
 ~ 
 ~ You can create an issue and ask the content creator to provide a release by following this link:
 ~ {issuesUri.Pastel(Color.CornflowerBlue)}
-";
-                    Console.WriteLine(lectures);
+");
                 }
             }
             catch (Exception e)
