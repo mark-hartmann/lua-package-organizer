@@ -26,16 +26,27 @@ namespace LuaPackageOrganizer.Commands
                 // This is a neat one, if the user tried to install a package without release it checks if the
                 // --no-release flag was set. If so, the package will use the projects active branch, otherwise
                 // the latest available release will be installed
-                var latestRelease = repository.GetLatestRelease(package, options.UseActiveBranch);
-                package = new Package(package.Vendor, package.PackageName, latestRelease);
 
-                var colorizedPackageName = package.FullName.Pastel(Color.CornflowerBlue);
-                var colorizedReleaseName = package.Release.Name.Pastel(Color.CornflowerBlue);
+                try
+                {
+                    var latestRelease = repository.GetLatestRelease(package, options.UseActiveBranch);
+                    package = new Package(package.Vendor, package.PackageName, latestRelease);
 
-                Terminal.WriteNotice(
-                    options.UseActiveBranch
-                        ? $"Warning: {colorizedPackageName} will use {colorizedReleaseName}, this may not be a good idea!"
-                        : $"Using latest release ({colorizedReleaseName}) for {colorizedPackageName}");
+                    var colorizedPackageName = package.FullName.Pastel(Color.CornflowerBlue);
+                    var colorizedReleaseName = package.Release.Name.Pastel(Color.CornflowerBlue);
+
+                    Terminal.WriteNotice(
+                        options.UseActiveBranch
+                            ? $"Warning: {colorizedPackageName} will use {colorizedReleaseName}, this may not be a good idea!"
+                            : $"Using latest release ({colorizedReleaseName}) for {colorizedPackageName}");
+                }
+                catch (Exception e)
+                {
+                    // This notices the user that he passed no release for a package not having any releases and the
+                    // option --no-release was not set
+                    Terminal.WriteError(e.Message);
+                    return;
+                }
             }
 
             try
@@ -47,7 +58,8 @@ namespace LuaPackageOrganizer.Commands
                     return;
                 }
 
-                if (!repository.IsReleaseAvailable(package, package.Release))
+                // Should only throw if the user does not use --no-release
+                if (!repository.IsReleaseAvailable(package, package.Release) && !options.UseActiveBranch)
                 {
                     throw new ReleaseNotFoundException(package);
                 }
@@ -79,11 +91,11 @@ namespace LuaPackageOrganizer.Commands
             catch (ReleaseNotFoundException e)
             {
                 var availableReleases = repository.GetAvailableReleases(e.FailedPackage);
-                
+
                 if (availableReleases.Count > 0)
                 {
                     Terminal.WriteNotice($"{e.Message}, the following releases are available:");
-                    
+
                     var releases = string.Join(", ",
                         availableReleases.Select(p => p.Name.Pastel(Color.CornflowerBlue)));
 
@@ -92,7 +104,7 @@ namespace LuaPackageOrganizer.Commands
                 else
                 {
                     Terminal.WriteError($"{e.Message}, no releases available");
-                    
+
                     var issuesUri = $"https://github.com/{options.Package}/issues";
 
                     Console.WriteLine($@"
