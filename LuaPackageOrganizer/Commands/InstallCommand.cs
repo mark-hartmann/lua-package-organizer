@@ -52,7 +52,6 @@ namespace LuaPackageOrganizer.Commands
                     throw new ReleaseNotFoundException(package);
                 }
 
-                // todo: Check if the dependencies are broken (Same package w/ different Releases) 
                 var packages = new List<Package>(repository.GetRequiredPackages(package)) {package};
 
                 var installationRequired =
