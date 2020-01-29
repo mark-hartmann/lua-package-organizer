@@ -36,7 +36,7 @@ namespace LuaPackageOrganizer.Packages.Repositories
                     // todo: Find a better solution for this
                     client.DownloadString(string.Format(PackageDetailsUri, package.Vendor, package.PackageName));
                 }
-                catch (WebException e)
+                catch (WebException)
                 {
                     return false;
                 }
