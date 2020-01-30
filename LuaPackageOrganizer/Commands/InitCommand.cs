@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Drawing;
 using System.IO;
 using LuaPackageOrganizer.Commands.Options;
 using LuaPackageOrganizer.Environments;
+using Pastel;
 
 namespace LuaPackageOrganizer.Commands
 {
@@ -13,7 +15,8 @@ namespace LuaPackageOrganizer.Commands
             {
                 if (!Directory.Exists(options.ProjectDirectory))
                 {
-                    throw new DirectoryNotFoundException($"Directory \"{options.ProjectDirectory}\" does not exist.");
+                    throw new DirectoryNotFoundException(
+                        $"Directory \"{options.ProjectDirectory.Pastel(Color.Coral)}\" does not exist.");
                 }
 
                 FileSystemEnvironment.Init(options.ProjectDirectory);
