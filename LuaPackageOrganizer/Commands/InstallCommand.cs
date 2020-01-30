@@ -40,7 +40,8 @@ namespace LuaPackageOrganizer.Commands
                     if (options.UseActiveBranch)
                     {
                         Terminal.WriteWarning($"Found branch: {colorizedReleaseName}",
-                            $"Package is going to be installed using {colorizedReleaseName}, this may not be a good idea!".Pastel(Color.Olive));
+                            $"Package is going to be installed using {colorizedReleaseName}, this may not be a good idea!"
+                                .Pastel(Color.Olive));
                     }
                     else
                     {
@@ -102,12 +103,9 @@ namespace LuaPackageOrganizer.Commands
 
                 if (availableReleases.Count > 0)
                 {
-                    Terminal.WriteNotice($"{e.Message}, the following releases are available:");
-
                     var releases = string.Join(", ",
                         availableReleases.Select(p => p.Name.Pastel(Color.CornflowerBlue)));
-
-                    Console.Write($"[{releases}]");
+                    Terminal.WriteNotice($"{e.Message}, the following releases are available:", $"[{releases}]");
                 }
                 else
                 {
