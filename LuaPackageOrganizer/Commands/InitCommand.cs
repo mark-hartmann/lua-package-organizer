@@ -21,7 +21,7 @@ namespace LuaPackageOrganizer.Commands
             catch (Exception e)
             {
                 Terminal.WriteNotice(e.Message);
-                Terminal.WriteError("Initialisation failed");
+                Terminal.WriteError("Initialization failed");
             }
         }
     }
