@@ -46,33 +46,35 @@ namespace LuaPackageOrganizer
             Success,
         }
 
-        public static void WriteError(string message) => 
+        public static void WriteError(string message) =>
             WriteLine(MessageType.Error, message, Color.Firebrick);
 
-        public static void WriteDebug(string message) => 
+        public static void WriteDebug(string message) =>
             WriteLine(MessageType.Debug, message, Color.Gray);
 
-        public static void WriteNotice(string message) => 
+        public static void WriteNotice(string message) =>
             WriteLine(MessageType.Notice, message, Color.LightGray);
 
-        public static void WriteSuccess(string message) => 
+        public static void WriteSuccess(string message) =>
             WriteLine(MessageType.Success, message, Color.LightGreen);
 
-        public static void WriteLine(MessageType? type, string message, Color textColor)
+        public static void WriteLine(MessageType? type, string message, Color textColor, bool showTime = true)
         {
-            Write(type, message + Environment.NewLine, textColor);
+            Write(type, message + Environment.NewLine, textColor, showTime);
         }
 
-        public static void Write(MessageType? type, string message, Color textColor)
+        public static void Write(MessageType? type, string message, Color textColor, bool showTime = true)
         {
             // Resolves the longest name so it can be used to set the totalWidth
             var totalWidth = Enum.GetNames(typeof(MessageType)).Max(s => s.Length);
             var messageTypeName = type != null ? Enum.GetName(typeof(MessageType), type) : "";
-            
+
             // totalWidth + 2 because of the braces around the message type
-            var messageType = $"{messageTypeName?.ToLower()}".PadLeft(totalWidth, ' ');
-            
-            Console.Write($"{DateTime.Now.TimeOfDay} ".Pastel(Color.LightGray));
+            var messageType = $"{messageTypeName?.ToLower()}".PadLeft(totalWidth + (showTime ? 0 : 14), ' ');
+
+            if (showTime)
+                Console.Write($"{DateTime.Now:HH:mm:ss.ffff} ");
+
             Console.Write($"{messageType} ".Pastel(Color.Olive));
             Console.Write($"{message}".Pastel(textColor));
         }
