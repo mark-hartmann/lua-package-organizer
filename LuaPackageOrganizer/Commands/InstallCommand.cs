@@ -23,6 +23,8 @@ namespace LuaPackageOrganizer.Commands
             // If the user does not provide a release to install, it must be resolved
             if (package.Release.Name == null)
             {
+                Terminal.WriteNotice("No release given, trying to find a suitable one...");
+
                 // This is a neat one, if the user tried to install a package without release it checks if the
                 // --no-release flag was set. If so, the package will use the projects active branch, otherwise
                 // the latest available release will be installed
@@ -35,10 +37,16 @@ namespace LuaPackageOrganizer.Commands
                     var colorizedPackageName = package.FullName.Pastel(Color.CornflowerBlue);
                     var colorizedReleaseName = package.Release.Name.Pastel(Color.CornflowerBlue);
 
-                    Terminal.WriteNotice(
-                        options.UseActiveBranch
-                            ? $"Warning: {colorizedPackageName} will use {colorizedReleaseName}, this may not be a good idea!"
-                            : $"Using latest release ({colorizedReleaseName}) for {colorizedPackageName}");
+                    if (options.UseActiveBranch)
+                    {
+                        Terminal.WriteWarning($"Found branch: {colorizedReleaseName}",
+                            $"Package is going to be installed using {colorizedReleaseName}, this may not be a good idea!".Pastel(Color.Olive));
+                    }
+                    else
+                    {
+                        Terminal.WriteNotice($"Found release: {colorizedReleaseName}",
+                            $"Using latest release ({colorizedReleaseName}) for {colorizedPackageName}");
+                    }
                 }
                 catch (Exception e)
                 {
@@ -56,7 +64,7 @@ namespace LuaPackageOrganizer.Commands
                 {
                     throw new ReleaseNotFoundException(package);
                 }
-                
+
                 // Early exit installation if the package is already installed
                 if (environment.PackageManager.IsInstalled(package, true))
                 {
