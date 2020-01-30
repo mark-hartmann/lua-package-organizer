@@ -23,8 +23,7 @@ namespace LuaPackageOrganizer.Commands
             }
             catch (Exception e)
             {
-                Terminal.WriteNotice(e.Message);
-                Terminal.WriteError("Initialisation failed");
+                Terminal.WriteError(e.Message, "Initialisation failed".Pastel(Color.Firebrick));
             }
         }
     }
