@@ -45,6 +45,7 @@ namespace LuaPackageOrganizer
             Debug,
             Notice,
             Success,
+            Warning
         }
 
         public static void WriteError(string message, params string[] additionalMessages) =>
@@ -55,6 +56,9 @@ namespace LuaPackageOrganizer
 
         public static void WriteNotice(string message, params string[] additionalMessages) =>
             WriteLine(MessageType.Notice, message, Color.LightGray, true, additionalMessages);
+        
+        public static void WriteWarning(string message, params string[] additionalMessages) =>
+            WriteLine(MessageType.Warning, message, Color.Olive, true, additionalMessages);
 
         public static void WriteSuccess(string message, params string[] additionalMessages) =>
             WriteLine(MessageType.Success, message, Color.LightGreen, true, additionalMessages);
