@@ -152,7 +152,7 @@ namespace LuaPackageOrganizer.Packages.Repositories
             client.DownloadProgressChanged += (s, e) => progress = e.ProgressPercentage;
             client.DownloadFileAsync(downloadUri, tempFile);
 
-            using (var progressbar = new ProgressBar())
+            using (var progressbar = new ProgressBar(19))
             {
                 while (client.IsBusy)
                     progressbar.Refresh(progress,

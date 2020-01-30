@@ -23,6 +23,8 @@ namespace LuaPackageOrganizer.Commands
             // If the user does not provide a release to install, it must be resolved
             if (package.Release.Name == null)
             {
+                Terminal.WriteNotice("No release given, trying to find a suitable one...");
+
                 // This is a neat one, if the user tried to install a package without release it checks if the
                 // --no-release flag was set. If so, the package will use the projects active branch, otherwise
                 // the latest available release will be installed
@@ -35,10 +37,17 @@ namespace LuaPackageOrganizer.Commands
                     var colorizedPackageName = package.FullName.Pastel(Color.CornflowerBlue);
                     var colorizedReleaseName = package.Release.Name.Pastel(Color.CornflowerBlue);
 
-                    Terminal.WriteNotice(
-                        options.UseActiveBranch
-                            ? $"Warning: {colorizedPackageName} will use {colorizedReleaseName}, this may not be a good idea!"
-                            : $"Using latest release ({colorizedReleaseName}) for {colorizedPackageName}");
+                    if (options.UseActiveBranch)
+                    {
+                        Terminal.WriteWarning($"Found branch: {colorizedReleaseName}",
+                            $"Package is going to be installed using {colorizedReleaseName}, this may not be a good idea!"
+                                .Pastel(Color.Olive));
+                    }
+                    else
+                    {
+                        Terminal.WriteNotice($"Found release: {colorizedReleaseName}",
+                            $"Using latest release ({colorizedReleaseName}) for {colorizedPackageName}");
+                    }
                 }
                 catch (Exception e)
                 {
@@ -56,7 +65,7 @@ namespace LuaPackageOrganizer.Commands
                 {
                     throw new ReleaseNotFoundException(package);
                 }
-                
+
                 // Early exit installation if the package is already installed
                 if (environment.PackageManager.IsInstalled(package, true))
                 {
@@ -72,7 +81,7 @@ namespace LuaPackageOrganizer.Commands
                 var installationNotRequired =
                     packages.Where(p => installationRequired.Contains(p) == false).ToList();
 
-                Terminal.WriteNotice($"{packages.Count} packages will now be installed");
+                Terminal.WriteNotice($"{packages.Count.ToString().Pastel(Color.Coral)} packages will now be installed");
                 foreach (var satisfied in installationNotRequired)
                 {
                     Terminal.WriteNotice($"{satisfied.FullName.Pastel(Color.CornflowerBlue)} is already satisfied");
@@ -94,12 +103,9 @@ namespace LuaPackageOrganizer.Commands
 
                 if (availableReleases.Count > 0)
                 {
-                    Terminal.WriteNotice($"{e.Message}, the following releases are available:");
-
                     var releases = string.Join(", ",
                         availableReleases.Select(p => p.Name.Pastel(Color.CornflowerBlue)));
-
-                    Console.Write($"[{releases}]");
+                    Terminal.WriteNotice($"{e.Message}, the following releases are available:", $"[{releases}]");
                 }
                 else
                 {
@@ -117,13 +123,18 @@ namespace LuaPackageOrganizer.Commands
 ~ {issuesUri.Pastel(Color.CornflowerBlue)}
 ");
                 }
+
+                return;
             }
             catch (Exception e)
             {
                 Terminal.WriteError(e.Message);
+                return;
             }
 
+            Terminal.WriteDebug("Writing changes...");
             environment.PackageManager.ApplyChanges();
+            Terminal.WriteSuccess("Done");
 
             // If the environment was modified (added folders) but failed during the installation process, the mess must
             // be cleaned and set back to the initial state

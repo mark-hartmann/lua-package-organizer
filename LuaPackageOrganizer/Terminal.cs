@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using Pastel;
 
@@ -11,24 +12,30 @@ namespace LuaPackageOrganizer
         private readonly int _cposl;
         private readonly int _cpost;
         private readonly bool _cursorVisible;
+        private readonly int _maxWidth;
 
-        public ProgressBar()
+        public ProgressBar(int maxWidth = 10)
         {
             _cpost = Console.CursorTop;
             _cposl = Console.CursorLeft;
             _cursorVisible = Console.CursorVisible;
+            _maxWidth = maxWidth;
 
             Console.CursorVisible = false;
         }
 
-        public void Refresh(int progress, string message)
+        public void Refresh(float progress, string message)
         {
             Console.SetCursorPosition(_cposl, _cpost);
 
-            var percentage = progress.ToString().PadLeft(3, ' ');
-            var progressBar = new string('=', progress / 10).PadRight(10, '-');
+            var width = (int) (progress / 100 * _maxWidth);
+            var fill = _maxWidth - width;
 
-            Console.Write($"[{progressBar}] {percentage}% ".Pastel(Color.Coral) + message);
+            var percentage = progress.ToString(CultureInfo.InvariantCulture).PadLeft(3, ' ');
+            var output =
+                $"[{string.Empty.PadLeft(width, '=')}{string.Empty.PadLeft(fill, '-')}] {percentage}% ";
+
+            Console.Write(output.Pastel(Color.Coral) + message);
         }
 
         public void Dispose()
@@ -56,7 +63,7 @@ namespace LuaPackageOrganizer
 
         public static void WriteNotice(string message, params string[] additionalMessages) =>
             WriteLine(MessageType.Notice, message, Color.LightGray, true, additionalMessages);
-        
+
         public static void WriteWarning(string message, params string[] additionalMessages) =>
             WriteLine(MessageType.Warning, message, Color.Olive, true, additionalMessages);
 
