@@ -123,13 +123,18 @@ namespace LuaPackageOrganizer.Commands
 ~ {issuesUri.Pastel(Color.CornflowerBlue)}
 ");
                 }
+
+                return;
             }
             catch (Exception e)
             {
                 Terminal.WriteError(e.Message);
+                return;
             }
 
+            Terminal.WriteDebug("Writing changes...");
             environment.PackageManager.ApplyChanges();
+            Terminal.WriteSuccess("Done");
 
             // If the environment was modified (added folders) but failed during the installation process, the mess must
             // be cleaned and set back to the initial state

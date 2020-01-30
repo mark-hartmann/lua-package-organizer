@@ -137,8 +137,7 @@ namespace LuaPackageOrganizer.Environments
             {
                 return;
             }
-
-            Terminal.WriteDebug("Writing changes...");
+            
             _lupoJson.WriteChanges();
             _lupoLock.WriteChanges();
         }
