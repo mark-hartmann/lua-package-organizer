@@ -91,7 +91,7 @@ namespace LuaPackageOrganizer.Environments
                 .Where(dep => !IsInstalled(dep, true)).ToList();
 
             Terminal.WriteNotice(
-                $"Searched for no longer required dependencies, found {removablePackages.Count.ToString()}");
+                $"Searched for no longer required dependencies, found {removablePackages.Count.ToString().Pastel(Color.Coral)}");
             foreach (var removablePackage in removablePackages)
             {
                 UninstallPackage(removablePackage);
@@ -113,8 +113,9 @@ namespace LuaPackageOrganizer.Environments
 
             if (passive)
             {
-                Terminal.WriteNotice($"{packageName} is required by another package and will not be removed entirely!");
-                Terminal.WriteNotice($"Removing {packageName} from lupo.json, leaving the rest as is...");
+                Terminal.WriteNotice($"{packageName} is required by another package and will not be removed entirely!",
+                    $"Removing {packageName} from lupo.json, leaving the rest as is...");
+
                 _lupoJson.RemovePackage(package);
             }
             else
@@ -137,7 +138,7 @@ namespace LuaPackageOrganizer.Environments
             {
                 return;
             }
-            
+
             _lupoJson.WriteChanges();
             _lupoLock.WriteChanges();
         }
