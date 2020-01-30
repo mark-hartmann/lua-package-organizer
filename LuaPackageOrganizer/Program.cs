@@ -14,7 +14,7 @@ namespace LuaPackageOrganizer
                 .WithParsed<InstallOptions>(opts => new InstallCommand().Execute(opts))
                 .WithParsed<RemoveOptions>(opts => new RemoveCommand().Execute(opts))
                 .WithNotParsed(Console.WriteLine);
-            
+
             Console.ResetColor();
         }
     }
