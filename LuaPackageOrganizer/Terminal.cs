@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using Pastel;
@@ -46,21 +47,30 @@ namespace LuaPackageOrganizer
             Success,
         }
 
-        public static void WriteError(string message) =>
-            WriteLine(MessageType.Error, message, Color.Firebrick);
+        public static void WriteError(string message, params string[] additionalMessages) =>
+            WriteLine(MessageType.Error, message, Color.Firebrick, true, additionalMessages);
 
-        public static void WriteDebug(string message) =>
-            WriteLine(MessageType.Debug, message, Color.Gray);
+        public static void WriteDebug(string message, params string[] additionalMessages) =>
+            WriteLine(MessageType.Debug, message, Color.Gray, true, additionalMessages);
 
-        public static void WriteNotice(string message) =>
-            WriteLine(MessageType.Notice, message, Color.LightGray);
+        public static void WriteNotice(string message, params string[] additionalMessages) =>
+            WriteLine(MessageType.Notice, message, Color.LightGray, true, additionalMessages);
 
-        public static void WriteSuccess(string message) =>
-            WriteLine(MessageType.Success, message, Color.LightGreen);
+        public static void WriteSuccess(string message, params string[] additionalMessages) =>
+            WriteLine(MessageType.Success, message, Color.LightGreen, true, additionalMessages);
 
-        public static void WriteLine(MessageType? type, string message, Color textColor, bool showTime = true)
+        public static void WriteLine(MessageType? type, string message, Color textColor, bool showTime = true,
+            IEnumerable<string> additionalMessages = null)
         {
             Write(type, message + Environment.NewLine, textColor, showTime);
+
+            if (additionalMessages == null)
+                return;
+
+            foreach (var additionalMessage in additionalMessages)
+            {
+                Write(null, additionalMessage + Environment.NewLine, Color.LightGray, false);
+            }
         }
 
         public static void Write(MessageType? type, string message, Color textColor, bool showTime = true)
