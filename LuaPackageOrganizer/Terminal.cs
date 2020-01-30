@@ -72,7 +72,7 @@ namespace LuaPackageOrganizer
             // totalWidth + 2 because of the braces around the message type
             var messageType = $"{messageTypeName?.ToLower()}".PadLeft(totalWidth, ' ');
             
-            Console.Write($"{DateTime.Now} ".Pastel(Color.LightGray));
+            Console.Write($"{DateTime.Now.TimeOfDay} ".Pastel(Color.LightGray));
             Console.Write($"{messageType} ".Pastel(Color.Olive));
             Console.Write($"{message}".Pastel(textColor));
         }
