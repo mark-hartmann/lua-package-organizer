@@ -81,7 +81,7 @@ namespace LuaPackageOrganizer.Commands
                 var installationNotRequired =
                     packages.Where(p => installationRequired.Contains(p) == false).ToList();
 
-                Terminal.WriteNotice($"{packages.Count} packages will now be installed");
+                Terminal.WriteNotice($"{packages.Count.ToString().Pastel(Color.Coral)} packages will now be installed");
                 foreach (var satisfied in installationNotRequired)
                 {
                     Terminal.WriteNotice($"{satisfied.FullName.Pastel(Color.CornflowerBlue)} is already satisfied");
