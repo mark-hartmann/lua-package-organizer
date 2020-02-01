@@ -25,6 +25,12 @@
   },
   "frameworks": {
     "netcoreapp3.0": {
+      "dependencies": {
+        "Pastel": {
+          "target": "Package",
+          "version": "[1.3.1, )"
+        }
+      },
       "imports": [
         "net461",
         "net462",
