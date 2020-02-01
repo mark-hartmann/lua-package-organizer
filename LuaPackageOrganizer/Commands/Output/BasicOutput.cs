@@ -14,7 +14,7 @@ namespace LuaPackageOrganizer.Commands.Output
 
         public void WriteLine(string message)
         {
-            Console.Write(message + Environment.NewLine);
+            Console.WriteLine(_processor.Process(message));
         }
     }
 }
