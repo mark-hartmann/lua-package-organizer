@@ -1,20 +1,20 @@
-﻿using System;
-using Console = Colorful.Console;
+﻿using Colorful;
+using TextProcessor;
 
 namespace LuaPackageOrganizer.Commands.Output
 {
     public class BasicOutput : IOutput
     {
-        private readonly TextProcessor _processor = new TextProcessor();
+        private readonly MessageProcessor _messageProcessor = new MessageProcessor();
 
         public void Write(string message)
         {
-            Console.Write(_processor.Process(message));
+            Console.Write(_messageProcessor.Process(message));
         }
 
         public void WriteLine(string message)
         {
-            Console.WriteLine(_processor.Process(message));
+            Console.WriteLine(_messageProcessor.Process(message));
         }
     }
 }

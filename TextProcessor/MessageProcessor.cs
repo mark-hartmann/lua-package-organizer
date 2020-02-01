@@ -6,7 +6,7 @@ using Pastel;
 
 namespace TextProcessor
 {
-    public class TextProcessor
+    public class MessageProcessor
     {
         private readonly Dictionary<string, Color> _colorMappings = new Dictionary<string, Color>
         {
