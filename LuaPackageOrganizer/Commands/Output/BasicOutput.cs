@@ -5,9 +5,11 @@ namespace LuaPackageOrganizer.Commands.Output
 {
     public class BasicOutput : IOutput
     {
+        private readonly TextProcessor _processor = new TextProcessor();
+
         public void Write(string message)
         {
-            Console.Write(message);
+            Console.Write(_processor.Process(message));
         }
 
         public void WriteLine(string message)
