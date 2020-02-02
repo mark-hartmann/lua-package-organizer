@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Xml;
 
 namespace TextProcessor
@@ -12,17 +11,6 @@ namespace TextProcessor
 
         private readonly Dictionary<string, Func<string>> _customSelfClosingNodes =
             new Dictionary<string, Func<string>>();
-
-        private readonly Dictionary<string, Color> _colorMappings = new Dictionary<string, Color>
-        {
-            {"package", Color.CornflowerBlue},
-            {"release", Color.CornflowerBlue},
-            {"warning", Color.Olive},
-            {"error", Color.Firebrick},
-            {"debug", Color.DarkGray},
-            {"file", Color.Coral},
-            {"dir", Color.Coral},
-        };
 
         public string Process(string rawMessage)
         {
