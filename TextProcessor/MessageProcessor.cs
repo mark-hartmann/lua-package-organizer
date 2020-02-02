@@ -2,12 +2,17 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Xml;
-using Pastel;
 
 namespace TextProcessor
 {
     public class MessageProcessor
     {
+        private readonly Dictionary<string, Func<string, string>> _customNodes =
+            new Dictionary<string, Func<string, string>>();
+
+        private readonly Dictionary<string, Func<string>> _customSelfClosingNodes =
+            new Dictionary<string, Func<string>>();
+
         private readonly Dictionary<string, Color> _colorMappings = new Dictionary<string, Color>
         {
             {"package", Color.CornflowerBlue},
@@ -28,25 +33,34 @@ namespace TextProcessor
 
             foreach (XmlNode child in document.DocumentElement.ChildNodes)
             {
-                switch (child.NodeType)
+                if (child.NodeType == XmlNodeType.Element)
                 {
-                    case XmlNodeType.Element:
-                    {
-                        var containsKey = _colorMappings.ContainsKey(child.Name);
-                        var color = _colorMappings[child.Name];
+                    var childElement = (XmlElement) child;
 
-                        message += containsKey ? child.InnerText.Pastel(color) : child.InnerText;
-                        break;
+                    if (childElement.IsEmpty == false && _customNodes.ContainsKey(childElement.Name))
+                    {
+                        var innerText = Process(child.InnerXml);
+                        message += _customNodes[childElement.Name](innerText);
                     }
-                    case XmlNodeType.Text:
-                        message += child.Value;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
+
+                    if (childElement.IsEmpty && _customSelfClosingNodes.ContainsKey(childElement.Name))
+                        message += _customSelfClosingNodes[childElement.Name]();
+                }
+                else if (child.NodeType == XmlNodeType.Text)
+                {
+                    message += child.Value;
+                }
+                else
+                {
+                    throw new ArgumentOutOfRangeException();
                 }
             }
 
             return message;
         }
+
+        public void AddCustomNode(string name, Func<string> func) => _customSelfClosingNodes[name] = func;
+
+        public void AddCustomNode(string name, Func<string, string> func) => _customNodes[name] = func;
     }
 }
