@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.IO;
 using LuaPackageOrganizer.Commands.Options;
+using LuaPackageOrganizer.Commands.Output;
 using LuaPackageOrganizer.Environments;
 using Pastel;
 
@@ -9,21 +10,21 @@ namespace LuaPackageOrganizer.Commands
 {
     public class InitCommand
     {
-        public void Execute(InitOptions options)
+        public void Execute(InitOptions options, IOutput output)
         {
             try
             {
                 if (!Directory.Exists(options.ProjectDirectory))
                 {
                     throw new DirectoryNotFoundException(
-                        $"Directory \"{options.ProjectDirectory.Pastel(Color.Coral)}\" does not exist.");
+                        $"Directory <dir>\"{options.ProjectDirectory}\"</dir> does not exist");
                 }
 
                 FileSystemEnvironment.Init(options.ProjectDirectory);
             }
             catch (Exception e)
             {
-                Terminal.WriteError(e.Message, "Initialization failed".Pastel(Color.Firebrick));
+                output.WriteError(e.Message, "Initialization failed");
             }
         }
     }
