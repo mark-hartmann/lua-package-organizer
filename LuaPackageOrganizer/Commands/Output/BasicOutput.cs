@@ -28,6 +28,8 @@ namespace LuaPackageOrganizer.Commands.Output
 
             _messageProcessor.AddCustomNode("time", () => Time + ' ');
             _messageProcessor.AddCustomNode("dir", (s) => s.Pastel(Color.Coral));
+            _messageProcessor.AddCustomNode("package", (s) => s.Pastel(Color.CornflowerBlue));
+            _messageProcessor.AddCustomNode("release", (s) => s.Pastel(Color.CornflowerBlue));
 
             foreach (var messageType in messageTypes)
             {
