@@ -12,6 +12,10 @@ namespace LuaPackageOrganizer.Packages
 
         public List<Release> GetAvailableReleases(Package package);
 
+        public Release GetLatestRelease(Package package, bool useDefaultBranch);
+
+        public IEnumerable<Package> GetRequiredPackages(Package package);
+
         public void DownloadFiles(Package package, string targetDirectory);
     }
 }

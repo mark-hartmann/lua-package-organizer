@@ -88,7 +88,7 @@ namespace LuaPackageOrganizer.Packages.Repositories
             return releases;
         }
 
-        public List<Package> GetRequiredPackages(Package package)
+        public IEnumerable<Package> GetRequiredPackages(Package package)
         {
             var requirements = new List<Package>();
             var totalRequirements = new List<Package>();
