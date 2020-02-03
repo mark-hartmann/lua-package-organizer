@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Drawing;
 using System.IO;
 using LuaPackageOrganizer.Commands.Options;
 using LuaPackageOrganizer.Commands.Output;
 using LuaPackageOrganizer.Environments;
-using Pastel;
 
 namespace LuaPackageOrganizer.Commands
 {
