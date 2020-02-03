@@ -64,7 +64,7 @@ namespace LuaPackageOrganizer.Packages.Repositories
             return false;
         }
 
-        public List<Release> GetAvailableReleases(Package package)
+        public IEnumerable<Release> GetAvailableReleases(Package package)
         {
             // If the available releases for this package were requested previously just return it from the release
             // cache. This saves additional http requests
@@ -118,7 +118,7 @@ namespace LuaPackageOrganizer.Packages.Repositories
             }
         }
 
-        public List<Package> GetDependencies(Package package)
+        public IEnumerable<Package> GetDependencies(Package package)
         {
             var dependencies = new List<Package>();
 
@@ -173,11 +173,11 @@ namespace LuaPackageOrganizer.Packages.Repositories
 
         public Release GetLatestRelease(Package package, bool useDefaultBranch)
         {
-            if (!useDefaultBranch && GetAvailableReleases(package).Count == 0)
+            if (!useDefaultBranch && GetAvailableReleases(package).Any())
                 throw new Exception(
                     $"{package.FullName.Pastel(Color.CornflowerBlue)} has no releases, you may want to use --no-release");
 
-            if (!useDefaultBranch && GetAvailableReleases(package).Count != 0)
+            if (!useDefaultBranch && GetAvailableReleases(package).Any())
                 return GetAvailableReleases(package).First();
 
             using var client = CreateWebClient();

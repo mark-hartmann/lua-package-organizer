@@ -8,9 +8,9 @@ namespace LuaPackageOrganizer.Packages
 
         public bool IsReleaseAvailable(Package package, Release release);
 
-        public List<Package> GetDependencies(Package package);
+        public IEnumerable<Package> GetDependencies(Package package);
 
-        public List<Release> GetAvailableReleases(Package package);
+        public IEnumerable<Release> GetAvailableReleases(Package package);
 
         public Release GetLatestRelease(Package package, bool useDefaultBranch);
 
