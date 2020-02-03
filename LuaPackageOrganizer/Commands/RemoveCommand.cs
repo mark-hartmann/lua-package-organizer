@@ -7,30 +7,39 @@ namespace LuaPackageOrganizer.Commands
 {
     public class RemoveCommand
     {
-        public void Execute(RemoveOptions options, IOutput output)
+        private readonly IOutput _output;
+        private readonly RemoveOptions _options;
+        private readonly FileSystemEnvironment _environment;
+        
+        public RemoveCommand(RemoveOptions options, IOutput output)
         {
-            var environment = new FileSystemEnvironment(options.ProjectDirectory, output);
-
+            _output = output;
+            _options = options;
+            _environment = new FileSystemEnvironment(options.ProjectDirectory, output);
+        }
+        
+        public void Execute()
+        {
             try
             {
                 // If the package was deliberately installed (using the "lupo install"-command), the package gets
                 // resolved. If not, the package was never installed and the resolved package's attributes are null
-                var package = environment.PackageManager.ResolveInstalled(options.Vendor, options.PackageName);
+                var package = _environment.PackageManager.ResolveInstalled(_options.Vendor, _options.PackageName);
 
                 if (package.PackageName == null)
                 {
                     throw new Exception(
-                        $"<package>{options.Package}</package> is not installed and therefore not removable");
+                        $"<package>{_options.Package}</package> is not installed and therefore not removable");
                 }
 
-                environment.PackageManager.Uninstall(package);
-                environment.PackageManager.ApplyChanges();
+                _environment.PackageManager.Uninstall(package);
+                _environment.PackageManager.ApplyChanges();
 
-                output.WriteSuccess("Done");
+                _output.WriteSuccess("Done");
             }
             catch (Exception e)
             {
-                output.WriteError(e.Message);
+                _output.WriteError(e.Message);
             }
         }
     }

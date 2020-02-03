@@ -8,21 +8,28 @@ namespace LuaPackageOrganizer.Commands
 {
     public class InitCommand
     {
-        public void Execute(InitOptions options, IOutput output)
+        private readonly IOutput _output;
+        private readonly InitOptions _options;
+
+        public InitCommand(InitOptions options, IOutput output)
+        {
+            _output = output;
+            _options = options;
+        }
+
+        public void Execute()
         {
             try
             {
-                if (!Directory.Exists(options.ProjectDirectory))
-                {
+                if (!Directory.Exists(_options.ProjectDirectory))
                     throw new DirectoryNotFoundException(
-                        $"Directory <dir>\"{options.ProjectDirectory}\"</dir> does not exist");
-                }
+                        $"Directory <dir>\"{_options.ProjectDirectory}\"</dir> does not exist");
 
-                FileSystemEnvironment.Init(options.ProjectDirectory);
+                FileSystemEnvironment.Init(_options.ProjectDirectory);
             }
             catch (Exception e)
             {
-                output.WriteError(e.Message, "Initialization failed");
+                _output.WriteError(e.Message, "Initialization failed");
             }
         }
     }
