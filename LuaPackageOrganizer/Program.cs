@@ -14,8 +14,8 @@ namespace LuaPackageOrganizer
             
             Parser.Default.ParseArguments<InitOptions, InstallOptions, RemoveOptions>(args)
                 .WithParsed<InitOptions>(opts => new InitCommand().Execute(opts, output))
-                .WithParsed<InstallOptions>(opts => new InstallCommand().Execute(opts))
-                .WithParsed<RemoveOptions>(opts => new RemoveCommand().Execute(opts))
+                .WithParsed<InstallOptions>(opts => new InstallCommand().Execute(opts, output))
+                .WithParsed<RemoveOptions>(opts => new RemoveCommand().Execute(opts, output))
                 .WithNotParsed(Console.WriteLine);
 
             Console.ResetColor();

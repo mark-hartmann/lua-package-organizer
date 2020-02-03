@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Drawing;
 using LuaPackageOrganizer.Commands.Options;
+using LuaPackageOrganizer.Commands.Output;
 using LuaPackageOrganizer.Environments;
-using Pastel;
 
 namespace LuaPackageOrganizer.Commands
 {
     public class RemoveCommand
     {
-        public void Execute(RemoveOptions options)
+        public void Execute(RemoveOptions options, IOutput output)
         {
             var environment = new FileSystemEnvironment(options.ProjectDirectory);
 
@@ -21,17 +20,17 @@ namespace LuaPackageOrganizer.Commands
                 if (package.PackageName == null)
                 {
                     throw new Exception(
-                        $"{options.Package.Pastel(Color.CornflowerBlue)} is not installed and therefore not removable");
+                        $"<package>{options.Package}</package> is not installed and therefore not removable");
                 }
 
                 environment.PackageManager.Uninstall(package);
                 environment.PackageManager.ApplyChanges();
 
-                Terminal.WriteSuccess("Done");
+                output.WriteSuccess("Done");
             }
             catch (Exception e)
             {
-                Terminal.WriteError(e.Message);
+                output.WriteError(e.Message);
             }
         }
     }
