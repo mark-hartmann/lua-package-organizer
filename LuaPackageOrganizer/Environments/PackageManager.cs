@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
+using LuaPackageOrganizer.Commands.Output;
 using LuaPackageOrganizer.Packages;
-using Pastel;
 
 namespace LuaPackageOrganizer.Environments
 {
@@ -12,13 +11,15 @@ namespace LuaPackageOrganizer.Environments
     {
         private readonly LupoJsonFile _lupoJson;
         private readonly LupoLockFile _lupoLock;
+        private readonly IOutput _output;
         private readonly FileSystemEnvironment _env;
 
-        public PackageManager(FileSystemEnvironment environment)
+        public PackageManager(FileSystemEnvironment environment, IOutput output)
         {
             IsModified = false;
 
             _env = environment;
+            _output = output;
             _lupoJson = LupoJsonFile.ParseFile(environment.LupoJsonFile);
             _lupoLock = LupoLockFile.ParseFile(environment.LupoLockFile);
         }
@@ -39,11 +40,8 @@ namespace LuaPackageOrganizer.Environments
                 if (resolvedPackage.Release.Equals(searchedPackage.Release))
                     return true;
 
-                var colorizedPackageName = searchedPackage.FullName.Pastel(Color.CornflowerBlue);
-                var colorizedReleaseName = resolvedPackage.Release.Name.Pastel(Color.CornflowerBlue);
-
                 throw new Exception(
-                    $"{colorizedPackageName} already installed, but using release {colorizedReleaseName}");
+                    $"<package>{searchedPackage.FullName}</package> already installed, but using release <release>{resolvedPackage.Release}</release>");
             }
 
             return ContainedIn(package, explicitly ? _lupoJson.Packages : _lupoLock.GetPackages());
@@ -68,19 +66,19 @@ namespace LuaPackageOrganizer.Environments
 
             if (explicitly)
             {
-                Terminal.WriteNotice($"Installing {package.FullName.Pastel(Color.CornflowerBlue)}");
+                _output.WriteNotice($"Installing <package>{package.FullName}</package>");
                 _lupoJson.AddPackage(package);
             }
             else
             {
-                Terminal.WriteNotice($"Installing {package.FullName.Pastel(Color.CornflowerBlue)} as dependency");
+                _output.WriteNotice($"Installing <package>{package.FullName}</package> as dependency");
             }
 
             IsModified = true;
             _lupoLock.LockPackage(package, repository);
 
             repository.DownloadFiles(package, InstallPath(package));
-            Console.WriteLine();
+            _output.WriteLine(null);
         }
 
         public void Uninstall(Package package)
@@ -90,8 +88,8 @@ namespace LuaPackageOrganizer.Environments
             var removablePackages = _lupoLock.GetRemovableDependencies(package)
                 .Where(dep => !IsInstalled(dep, true)).ToList();
 
-            Terminal.WriteNotice(
-                $"Searched for no longer required dependencies, found {removablePackages.Count.ToString().Pastel(Color.Coral)}");
+            _output.WriteNotice($"Searched for no longer required dependencies, found {removablePackages.Count}");
+            
             foreach (var removablePackage in removablePackages)
             {
                 UninstallPackage(removablePackage);
@@ -109,12 +107,10 @@ namespace LuaPackageOrganizer.Environments
         /// <param name="passive">If true, the package is removed from the lupo.json only</param>
         private void UninstallPackage(Package package, bool passive = false)
         {
-            var packageName = package.FullName.Pastel(Color.CornflowerBlue);
-
             if (passive)
             {
-                Terminal.WriteNotice($"{packageName} is required by another package and will not be removed entirely!",
-                    $"Removing {packageName} from lupo.json, leaving the rest as is...");
+                _output.WriteNotice($"<package>{package.FullName}</package> is required by another package and will not be removed entirely!",
+                    $"Removing <package>{package.FullName}</package from lupo.json, leaving the rest as is...");
 
                 _lupoJson.RemovePackage(package);
             }
@@ -123,7 +119,7 @@ namespace LuaPackageOrganizer.Environments
                 // Removes every file withing the packages installation directory
                 Directory.Delete(InstallPath(package), true);
 
-                Terminal.WriteDebug($"Removing {packageName}");
+                _output.WriteNotice($"Removing <package>{package.FullName}</package>");
 
                 _lupoLock.UnlockPackage(package);
                 _lupoJson.RemovePackage(package);

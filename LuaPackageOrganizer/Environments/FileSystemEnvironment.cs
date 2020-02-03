@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.IO;
+using LuaPackageOrganizer.Commands.Output;
 using Pastel;
 
 namespace LuaPackageOrganizer.Environments
@@ -12,7 +13,7 @@ namespace LuaPackageOrganizer.Environments
         public readonly string VendorDirectoryPath;
         public readonly IPackageManager PackageManager;
 
-        public FileSystemEnvironment(string root)
+        public FileSystemEnvironment(string root, IOutput output)
         {
             // If root is null the current working directory is used instead
             root ??= Directory.GetCurrentDirectory();
@@ -23,7 +24,7 @@ namespace LuaPackageOrganizer.Environments
 
             VerifyProjectDirectory();
 
-            PackageManager = new PackageManager(this);
+            PackageManager = new PackageManager(this, output);
         }
 
         private void VerifyProjectDirectory()

@@ -13,7 +13,7 @@ namespace LuaPackageOrganizer.Commands
     {
         public void Execute(InstallOptions options, IOutput output)
         {
-            var environment = new FileSystemEnvironment(options.ProjectDirectory);
+            var environment = new FileSystemEnvironment(options.ProjectDirectory, output);
             var repository = new GithubRepository();
 
             // Create package using the given options
